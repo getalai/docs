@@ -51,9 +51,4 @@
     }
   ],
   "footerSocials": {},
-  "analytics": {
-    "posthog": {
-      "apiKey": "phx_OPF8VKGuqeTvbgNGz1SXdDfWg3tXMHA3rWC1MIg0eP6",
-    }
-  }
 }
