@@ -26,8 +26,7 @@
     "url": "https://getalai.com"
   },
   "feedback": {
-    "thumbsRating": true,
-    "suggestEdit": true
+    "thumbsRating": true
   },
   "anchors": [],
   "navigation": [
