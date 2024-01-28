@@ -45,6 +45,12 @@
         "insert-slide",
         "change-theme"
       ]
+    },
+    {
+      "group": "Account settings",
+      "pages": [
+        "billing"
+      ]
     }
   ],
   "footerSocials": {
