@@ -25,8 +25,7 @@
     "name": "Download Now",
     "url": "https://getalai.com"
   },
-  "anchors": [
-  ],
+  "anchors": [],
   "navigation": [
     {
       "group": "Get Started",
@@ -48,11 +47,13 @@
     },
     {
       "group": "Account settings",
-      "pages": [
-        "billing/billing"
-      ]
+      "pages": ["billing/billing"]
     }
   ],
-  "footerSocials": {
+  "footerSocials": {},
+  "analytics": {
+    "posthog": {
+      "apiKey": "phx_OPF8VKGuqeTvbgNGz1SXdDfWg3tXMHA3rWC1MIg0eP6",
+    }
   }
 }
