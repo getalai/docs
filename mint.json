@@ -31,25 +31,25 @@
     {
       "group": "Get Started",
       "pages": [
-        "introduction",
-        "create-new",
-        "edit-presentation"
+        "getting-started/introduction",
+        "getting-started/create-new",
+        "getting-started/edit-presentation"
       ]
     },
     {
       "group": "Edit Presentation",
       "pages": [
-        "rewrite-slide",
-        "rewrite-section",
-        "change-layout",
-        "insert-slide",
-        "change-theme"
+        "edit/rewrite-slide",
+        "edit/rewrite-section",
+        "edit/change-layout",
+        "edit/insert-slide",
+        "edit/change-theme"
       ]
     },
     {
       "group": "Account settings",
       "pages": [
-        "billing"
+        "billing/billing"
       ]
     }
   ],
