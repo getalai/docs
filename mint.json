@@ -25,6 +25,10 @@
     "name": "Download Now",
     "url": "https://getalai.com"
   },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true
+  },
   "anchors": [],
   "navigation": [
     {
