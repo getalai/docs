@@ -22,7 +22,7 @@
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
+    "name": "Download Now",
     "url": "https://getalai.com"
   },
   "anchors": [
@@ -34,6 +34,16 @@
         "introduction",
         "create-new",
         "edit-presentation"
+      ]
+    },
+    {
+      "group": "Edit Presentation",
+      "pages": [
+        "rewrite-slide",
+        "rewrite-section",
+        "change-layout",
+        "insert-slide",
+        "change-theme"
       ]
     }
   ],
