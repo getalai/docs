@@ -33,24 +33,8 @@
     {
       "group": "Get Started",
       "pages": [
-        "getting-started/introduction",
-        "getting-started/create-new",
-        {
-          "group": "Edit Presentation",
-          "pages": [
-            "edit/overview",
-            "edit/rewrite-slide",
-            "edit/rewrite-section",
-            "edit/change-layout",
-            "edit/insert-slide",
-            "edit/change-theme"
-          ]
-        }
+        "getting-started/introduction-to-alai-api"
       ]
-    },
-    {
-      "group": "Account settings",
-      "pages": ["billing/billing"]
     }
   ],
   "footerSocials": {}
