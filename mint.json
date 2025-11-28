@@ -3,15 +3,16 @@
   "name": "Alai Docs",
   "logo": {
     "dark": "/logo/alai_white.svg",
-    "light": "/logo/alai_dark.svg"
+    "light": "/logo/alai_dark.svg",
+    "href": "https://getalai.com/"
   },
   "favicon": "/favicon.png",
   "colors": {
     "primary": "#0A1E2D",
-    "light": "#4A4A4A",
+    "light": "#B8B8B8",
     "dark": "#9586E8",
     "anchors": {
-      "from": "#4A4A4A",
+      "from": "#B8B8B8",
       "to": "#FFFFFF"
     }
   },
