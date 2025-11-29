@@ -3,10 +3,26 @@ title: "How to get started with Alai API"
 description: "The Alai API enables you to transform text content into fully designed presentations. Simply provide your content, customize the style and tone preferences, and receive a presentation link."
 ---
 
+## Getting Your API Key
+
+Before you can use the Alai API, you'll need to generate an API key:
+
+1. **Sign up** at [app.getalai.com](https://app.getalai.com)
+2. **Click on your name** in the left sidebar
+3. **Select "API"** from the dropdown menu
+4. **Click "Add new API key"** to generate your key
+5. **Copy and securely store** your API key - you'll need it for authentication
+
+<Warning>
+Keep your API key secure and never share it publicly. Treat it like a password.
+</Warning>
+
+---
+
 # Generations Endpoint
 
 ```bash
-curl -X POST "https://alai-standalone-backend.getalai.com/api/v1/generations" \
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "input_text=Quarterly sales increased 25% YoY. Key drivers: enterprise segment growth, new product launches, expanded market reach." \
   -F "additional_instructions=Make it infographic" \
@@ -135,7 +151,7 @@ info:
   description: Transform text content into fully designed presentations
   version: 1.0.0
 servers:
-  - url: https://app.getalai.com/api/v1
+  - url: https://slides-api.getalai.com/api/v1
 paths:
   /generations:
     post:
