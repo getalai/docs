@@ -45,7 +45,7 @@
                   },
                   "theme_id": {
                     "type": "string",
-                    "enum": ["flat_white", "desert_bloom", "lapis_dawn", "emerald_forest", "cosmic_thread", "donut"],
+                    "enum": ["flat_white", "desert_bloom", "lapis_dawn", "emerald_forest", "cosmic_thread", "donut", "oak", "obsidian_flow", "midnight_ember", "aurora_flux"],
                     "description": "Defines which theme from Alai will be used for presentation",
                     "example": "flat_white"
                   },
@@ -112,7 +112,7 @@
                   },
                   "text_content_mode": {
                     "type": "string",
-                    "enum": ["PRESERVE", "ENHANCE", "CONDENSE", "CUSTOM"],
+                    "enum": ["preserve", "enhance", "condense", "custom"],
                     "description": "Controls how input text is processed and adapted for presentation format",
                     "example": "preserve"
                   },
@@ -122,7 +122,7 @@
                   },
                   "text_amount_mode": {
                     "type": "string",
-                    "enum": ["MINIMAL", "ESSENTIAL", "BALANCED", "DETAILED", "CUSTOM"],
+                    "enum": ["minimal", "essential", "balanced", "detailed", "custom"],
                     "description": "Controls the density of text appearing on each slide",
                     "example": "essential"
                   },
@@ -137,7 +137,7 @@
                   },
                   "ai_image_style_type": {
                     "type": "string",
-                    "enum": ["AUTO", "REALISTIC", "ARTISTIC", "CARTOON", "THREE_D", "CUSTOM"],
+                    "enum": ["auto", "realistic", "artistic", "cartoon", "three_d", "custom"],
                     "description": "Controls the visual style of AI-generated images",
                     "example": "three_d"
                   },
