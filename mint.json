@@ -29,12 +29,20 @@
   "feedback": {
     "thumbsRating": true
   },
+  "openapi": ["/openapi.json"],
+  "api": {
+    "playground": {
+      "display": "interactive"
+    }
+  },
   "anchors": [],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Alai API",
+      "tag": "Beta",
       "pages": [
-        "getting-started/introduction-to-alai-api"
+        "api-reference/introduction",
+        "api-reference/generations"
       ]
     }
   ],
