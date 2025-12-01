@@ -122,11 +122,10 @@ Before you can use the Alai API, you'll need to generate an API key:
                     "example": "English (UK)"
                   },
                   "choices_per_slide": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 4,
+                    "type": "string",
+                    "enum": ["1", "2", "3", "4"],
                     "description": "The number of slide variants to generate per slide (1-4). We usually generate 4 variants per slide on the product but the API gives you freedom to choose.",
-                    "example": 1
+                    "example": "1"
                   },
                   "tone_type": {
                     "type": "string",
@@ -190,13 +189,13 @@ Before you can use the Alai API, you'll need to generate an API key:
                       "type": "string",
                       "format": "uri",
                       "description": "Direct URL to view the generated presentation",
-                      "example": "https://app.getalai.com/presentation/9c5301d1-46bd-490b-888d-84a155685e82"
+                      "example": "https://app.getalai.com/presentation/<uuid>"
                     },
                     "presentation_id": {
                       "type": "string",
                       "format": "uuid",
                       "description": "Unique identifier for the presentation",
-                      "example": "9c5301d1-46bd-490b-888d-84a155685e82"
+                      "example": "<uuid>"
                     }
                   },
                   "required": ["presentation_url", "presentation_id"]
