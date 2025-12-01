@@ -38,8 +38,7 @@
   "anchors": [],
   "navigation": [
     {
-      "group": "Alai API",
-      "tag": "Beta",
+      "group": "Alai API (Beta)",
       "pages": [
         "api-reference/introduction",
         "api-reference/generations"
