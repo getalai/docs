@@ -75,13 +75,13 @@ Before you can use the Alai API, you'll need to generate an API key:
                     "type": "string",
                     "enum": ["flat_white", "desert_bloom", "lapis_dawn", "emerald_forest", "cosmic_thread", "donut", "oak", "obsidian_flow", "midnight_ember", "aurora_flux"],
                     "description": "Defines which theme from Alai will be used for presentation",
-                    "example": "flat_white"
+                    "default": "flat_white"
                   },
                   "slide_range": {
                     "type": "string",
                     "enum": ["auto", "1", "2-5", "6-10", "11-15", "16-20", "21-25"],
                     "description": "Controls the target number of slides generated from your content",
-                    "example": "6-10"
+                    "default": "6-10"
                   },
                   "language": {
                     "type": "string",
@@ -119,19 +119,19 @@ Before you can use the Alai API, you'll need to generate an API key:
                       "Indonesian"
                     ],
                     "description": "Specifies the language for generated content and AI-generated elements",
-                    "example": "English (UK)"
+                    "default": "English (US)"
                   },
                   "choices_per_slide": {
                     "type": "string",
                     "enum": ["1", "2", "3", "4"],
                     "description": "The number of slide variants to generate per slide (1-4). We usually generate 4 variants per slide on the product but the API gives you freedom to choose.",
-                    "example": "1"
+                    "default": "1"
                   },
                   "tone_type": {
                     "type": "string",
                     "enum": ["DEFAULT", "PROFESSIONAL", "CASUAL", "TECHNICAL", "EDUCATIONAL", "INSPIRATIONAL", "NARRATIVE", "PERSUASIVE", "AUTHORITATIVE", "EMPATHETIC", "CUSTOM"],
                     "description": "Defines the writing voice, style, and perspective applied to generated content",
-                    "example": "PROFESSIONAL"
+                    "default": "PROFESSIONAL"
                   },
                   "tone_instructions": {
                     "type": "string",
@@ -141,7 +141,7 @@ Before you can use the Alai API, you'll need to generate an API key:
                     "type": "string",
                     "enum": ["preserve", "enhance", "condense", "custom"],
                     "description": "Controls how input text is processed and adapted for presentation format",
-                    "example": "preserve"
+                    "default": "preserve"
                   },
                   "text_content_instructions": {
                     "type": "string",
@@ -151,7 +151,7 @@ Before you can use the Alai API, you'll need to generate an API key:
                     "type": "string",
                     "enum": ["minimal", "essential", "balanced", "detailed", "custom"],
                     "description": "Controls the density of text appearing on each slide",
-                    "example": "essential"
+                    "default": "essential"
                   },
                   "text_amount_instructions": {
                     "type": "string",
@@ -160,13 +160,13 @@ Before you can use the Alai API, you'll need to generate an API key:
                   "include_ai_images": {
                     "type": "boolean",
                     "description": "Whether to generate AI-powered illustrations alongside your content",
-                    "example": true
+                    "default": true
                   },
                   "ai_image_style_type": {
                     "type": "string",
                     "enum": ["auto", "realistic", "artistic", "cartoon", "three_d", "custom"],
                     "description": "Controls the visual style of AI-generated images",
-                    "example": "three_d"
+                    "default": "three_d"
                   },
                   "ai_image_style_instructions": {
                     "type": "string",
