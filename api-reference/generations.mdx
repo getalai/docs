@@ -2,3 +2,99 @@
 title: "Playground"
 openapi: "POST /generations"
 ---
+
+## Using the Playground
+
+The `data` field accepts a JSON string containing all your generation options. Copy the template below and customize it for your needs.
+
+<Tip>
+  Only `input_text` is required. All other options have sensible defaults, so you can start simple and add customization as needed.
+</Tip>
+
+### Full Template
+
+Copy this JSON and paste it into the `data` field above:
+
+```json
+{
+  "input_text": "Your presentation content goes here...",
+  "additional_instructions": "Make it visually engaging",
+  "presentation_options": {
+    "title": "My Presentation",
+    "theme_id": "FLAT_WHITE",
+    "slide_range": "6-10",
+    "choices_per_slide": 1
+  },
+  "text_options": {
+    "language": "English (US)",
+    "tone": "PROFESSIONAL",
+    "content_mode": "preserve",
+    "amount_mode": "essential"
+  },
+  "image_options": {
+    "include_ai_images": true,
+    "style": "three_d"
+  }
+}
+```
+
+### Minimal Template
+
+Start with just the essentials:
+
+```json
+{
+  "input_text": "Your presentation content goes here..."
+}
+```
+
+---
+
+## Available Options
+
+### Themes
+
+| Theme ID | Description |
+|----------|-------------|
+| `FLAT_WHITE` | Clean, minimal white theme (default) |
+| `DESERT_BLOOM` | Warm desert-inspired colors |
+| `LAPIS_DAWN` | Blue sunrise tones |
+| `EMERALD_FOREST` | Rich green forest theme |
+| `COSMIC_THREAD` | Space-inspired dark theme |
+| `DONUT` | Playful, colorful theme |
+| `OAK` | Natural wood tones |
+| `OBSIDIAN_FLOW` | Sleek dark obsidian |
+| `MIDNIGHT_EMBER` | Dark with warm accents |
+| `AURORA_FLUX` | Northern lights inspired |
+
+### Tone Options
+
+| Tone | Best For |
+|------|----------|
+| `PROFESSIONAL` | Business presentations (default) |
+| `CASUAL` | Informal, friendly content |
+| `TECHNICAL` | Technical documentation |
+| `EDUCATIONAL` | Teaching and learning |
+| `INSPIRATIONAL` | Motivational content |
+| `NARRATIVE` | Storytelling presentations |
+| `PERSUASIVE` | Sales and pitches |
+| `AUTHORITATIVE` | Expert-level content |
+| `EMPATHETIC` | Sensitive topics |
+| `CUSTOM` | Use with `tone_instructions` |
+
+### Image Styles
+
+| Style | Description |
+|-------|-------------|
+| `three_d` | 3D rendered illustrations (default) |
+| `realistic` | Photorealistic images |
+| `artistic` | Artistic, painterly style |
+| `cartoon` | Cartoon illustrations |
+| `auto` | AI selects best style |
+| `custom` | Use with `style_instructions` |
+
+---
+
+## Full Schema Reference
+
+For complete field documentation with all options, see the [Introduction](/api-reference/introduction#request-body-schema) page.
