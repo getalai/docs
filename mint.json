@@ -40,8 +40,8 @@
     {
       "group": "Alai API (Beta)",
       "pages": [
-        "api-reference/introduction",
-        "api-reference/generations"
+        "api/introduction",
+        "api/generations"
       ]
     }
   ],
