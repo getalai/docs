@@ -186,10 +186,11 @@ Before you can use the Alai API, you'll need to generate an API key:
                         "description": "Options for AI-generated images",
                         "properties": {
                           "include_ai_images": {
-                            "type": "boolean",
+                            "type": "string",
+                            "enum": ["true", "false"],
                             "description": "Whether to generate AI-powered illustrations alongside your content.",
-                            "default": true,
-                            "example": true
+                            "default": "true",
+                            "example": "true"
                           },
                           "style": {
                             "type": "string",
