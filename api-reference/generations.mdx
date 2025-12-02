@@ -11,30 +11,3 @@ The `data` field accepts a JSON string containing all your generation options. C
   Only `input_text` is required. All other options have sensible defaults, so you can start simple and add customization as needed.
 </Tip>
 
-### Full Template
-
-Copy this JSON and paste it into the `data` field above:
-
-```json
-{
-  "input_text": "Your presentation content goes here...",
-  "additional_instructions": "Make it visually engaging",
-  "presentation_options": {
-    "title": "My Presentation",
-    "theme_id": "FLAT_WHITE",
-    "slide_range": "6-10",
-    "choices_per_slide": 1
-  },
-  "text_options": {
-    "language": "English (US)",
-    "tone": "PROFESSIONAL",
-    "content_mode": "preserve",
-    "amount_mode": "essential"
-  },
-  "image_options": {
-    "include_ai_images": true,
-    "style": "three_d"
-  }
-}
-```
-

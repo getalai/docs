@@ -7,8 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://b18f9ad70e5f.ngrok-free.app/api/v1",
-      "description": "Test server"
+      "url": "https://slides-api.getalai.com/api/v1"
     }
   ],
   "paths": {
