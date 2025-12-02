@@ -41,6 +41,7 @@
                       "additional_instructions": {
                         "type": "string",
                         "description": "Custom generation instructions for AI that fine-tune how content is delivered on the presentation.",
+                        "default": "",
                         "example": "Make it infographic"
                       },
                       "presentation_options": {
@@ -158,10 +159,11 @@
                         "description": "Options for AI-generated images",
                         "properties": {
                           "include_ai_images": {
-                            "type": "boolean",
+                            "type": "string",
+                            "enum": ["true", "false"],
                             "description": "Whether to generate AI-powered illustrations alongside your content.",
-                            "default": true,
-                            "example": true
+                            "default": "true",
+                            "example": "true"
                           },
                           "style": {
                             "type": "string",
