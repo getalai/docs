@@ -179,6 +179,15 @@
                         "description": "Custom image generation directives for specialized visual requirements. Set only when style is custom."
                       }
                     }
+                  },
+                  "image_urls": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "description": "Array of image URLs to include in the presentation. These images will be used alongside or instead of AI-generated images.",
+                    "example": ["https://example.com/image1.png", "https://example.com/image2.jpg"]
                   }
                 }
               }
