@@ -1,0 +1,63 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Alai Docs",
+  "colors": {
+    "primary": "#0A1E2D",
+    "light": "#B8B8B8",
+    "dark": "#9586E8"
+  },
+  "favicon": "/favicon.png",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Alai API (Beta)",
+        "pages": [
+          "api/introduction",
+          "api/generations"
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/alai_dark.svg",
+    "dark": "/logo/alai_white.svg",
+    "href": "https://getalai.com/"
+  },
+  "api": {
+    "openapi": [
+      "openapi.json"
+    ],
+    "playground": {
+      "display": "interactive"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:founders@getalai.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Try Now",
+      "href": "https://getalai.com"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {}
+  }
+}
