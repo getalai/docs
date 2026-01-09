@@ -71,8 +71,8 @@
                       },
                       "export_as": {
                         "type": "string",
-                        "enum": ["link", "id", "pdf"],
-                        "description": "Controls the response format. `link` waits for completion and returns the presentation URL. `id` returns immediately with the presentation ID while generation continues in background. `pdf` waits for completion and returns the presentation as a PDF file.",
+                        "enum": ["link", "id", "pdf", "ppt"],
+                        "description": "Controls the response format. `link` waits for completion and returns the presentation URL. `id` returns immediately with the presentation ID while generation continues in background. `pdf` / `ppt` waits for completion and returns the presentation as a PDF or PPT file.",
                         "default": "link",
                         "example": "link"
                       }
