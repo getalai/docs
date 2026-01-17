@@ -182,7 +182,7 @@
           "External API"
         ],
         "summary": "Check generation status",
-        "description": "Poll this endpoint to check the status of any async operation (presentation generation, slide creation, export, or transcript generation).\n\n**Status values:**\n- `pending` - Queued, not yet started\n- `in_progress` - Currently processing\n- `completed` - Finished successfully; results available in response\n- `failed` - Error occurred; check `error` field for details\n\n**Recommended polling:** Every 2-5 seconds. Most generations complete within 30-120 seconds.",
+        "description": "Poll this endpoint to check the status of any async operation (presentation generation, slide creation, export, or transcript generation).\n\n**Status values:**\n- `pending` - Queued, not yet started\n- `in_progress` - Currently processing\n- `completed` - Finished successfully; results available in response\n- `failed` - Error occurred; check `error` field for details\n\n**Recommended polling:** Every 5 seconds. Most generations complete within 1-3 minutes depending on slide count.",
         "operationId": "get_generation_status_api_v1_generations__generation_id__get",
         "parameters": [
           {
