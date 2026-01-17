@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
 sidebarTitle: "Introduction"
-description: "The Alai API enables you to programmatically generate presentations from text content. All operations are async - submit a request, get a generation ID, then poll for results."
+description: "The Alai API enables you to programmatically generate presentations from text content. Generation operations are async - submit a request, get a generation ID, then poll for results."
 ---
 
 ## How to get your API Key
@@ -60,16 +60,25 @@ All generation operations are **asynchronous**. Here's the typical flow:
 
 ## Available Endpoints
 
+### Async Operations
+These endpoints return a `generation_id`. Poll `GET /generations/{id}` until complete.
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/generations` | POST | Generate a presentation |
+| `/presentations/{id}/slides` | POST | Add a slide to a presentation |
+| `/presentations/{id}/exports` | POST | Export presentation to PDF/PPT |
+| `/presentations/{id}/transcripts` | POST | Generate slide transcripts |
+
+### Synchronous Operations
+These endpoints return results immediately.
+
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/ping` | GET | Verify API key |
-| `/generations` | POST | Generate a presentation |
 | `/generations/{id}` | GET | Check generation status |
 | `/upload-images` | POST | Upload images for use in presentations |
-| `/presentations/{id}/slides` | POST | Add a slide to a presentation |
 | `/presentations/{id}/slides/{slide_id}` | DELETE | Delete a slide |
-| `/presentations/{id}/exports` | POST | Export presentation to PDF/PPT |
-| `/presentations/{id}/transcripts` | POST | Generate slide transcripts |
 | `/presentations/{id}` | DELETE | Delete a presentation |
 
 ---
