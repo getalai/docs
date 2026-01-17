@@ -194,39 +194,6 @@ class AlaiClient:
             return self.wait_for_completion(result["generation_id"])
         return result
 
-    def generate_transcripts(
-        self,
-        presentation_id: str,
-        slide_ids: List[str] = None,
-        wait: bool = True
-    ) -> dict:
-        """
-        Generate speaker notes for slides.
-
-        Args:
-            presentation_id: ID of the presentation
-            slide_ids: Specific slides (None = all slides)
-            wait: If True, polls until completion
-
-        Returns:
-            Transcripts for each slide
-        """
-        payload = {}
-        if slide_ids:
-            payload["slide_ids"] = slide_ids
-
-        response = requests.post(
-            f"{self.base_url}/presentations/{presentation_id}/transcripts",
-            headers=self.headers,
-            json=payload
-        )
-        response.raise_for_status()
-        result = response.json()
-
-        if wait:
-            return self.wait_for_completion(result["generation_id"])
-        return result
-
     def upload_images(self, file_paths: List[str]) -> List[str]:
         """
         Upload images for use in presentations.
@@ -537,51 +504,7 @@ for r in results:
 
 ---
 
-## Example 6: Generate Speaker Notes
-
-Create talking points for your slides to help with presentations.
-
-```python
-from alai_client import AlaiClient
-
-client = AlaiClient("your_api_key")
-
-# Generate a presentation first
-result = client.generate_presentation(
-    content="""
-    AI in Healthcare
-
-    1. Early Disease Detection
-    - AI can detect cancer earlier than traditional methods
-    - 94% accuracy in detecting diabetic retinopathy
-
-    2. Drug Discovery
-    - Reduces development time from 10 years to 2-3 years
-    - Lower costs and faster trials
-
-    3. Personalized Treatment
-    - Treatment plans based on genetic profiles
-    - Better outcomes, fewer side effects
-    """,
-    title="AI in Healthcare",
-    slide_range="6-10"
-)
-
-presentation_id = result["presentation_id"]
-
-# Generate speaker notes for all slides
-transcripts = client.generate_transcripts(presentation_id)
-
-print("=== Speaker Notes ===\n")
-for slide in transcripts.get("transcripts", []):
-    print(f"Slide {slide['slide_order'] + 1}: {slide['title']}")
-    print(f"{slide['content']}\n")
-    print("-" * 50 + "\n")
-```
-
----
-
-## Example 7: Presentations with Custom Images
+## Example 6: Presentations with Custom Images
 
 Upload your own images to include in presentations.
 
