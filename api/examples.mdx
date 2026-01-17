@@ -1,0 +1,717 @@
+---
+title: "Examples & Use Cases"
+sidebarTitle: "Examples"
+description: "Complete Python examples and real-world use cases for the Alai API."
+---
+
+This guide provides complete, working examples for common Alai API workflows. All examples use Python with the `requests` library.
+
+## Installation
+
+```bash
+pip install requests
+```
+
+---
+
+## AlaiClient Helper Class
+
+Copy this helper class to simplify your Alai API integrations. It handles polling, error handling, and provides a clean interface for all operations.
+
+```python
+"""
+Alai API Python Client
+A simple wrapper for common Alai API operations
+"""
+import requests
+import time
+from typing import List, Optional
+
+
+class AlaiClient:
+    """Simple Python client for the Alai API."""
+
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.base_url = "https://slides-api.getalai.com/api/v1"
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+
+    def generate_presentation(
+        self,
+        content: str,
+        title: str = "Presentation",
+        slide_range: str = "auto",
+        theme: str = "AMETHYST_LIGHT",
+        export_formats: List[str] = None,
+        wait: bool = True,
+        timeout: int = 300
+    ) -> dict:
+        """
+        Generate a presentation from text content.
+
+        Args:
+            content: The text content to transform into slides
+            title: Presentation title
+            slide_range: Number of slides ("auto", "1", "2-5", "6-10", etc.)
+            theme: Visual theme ID
+            export_formats: List of formats ["link", "pdf", "ppt"]
+            wait: If True, polls until completion
+            timeout: Max seconds to wait
+
+        Returns:
+            Generation result with presentation URLs
+        """
+        if export_formats is None:
+            export_formats = ["link"]
+
+        response = requests.post(
+            f"{self.base_url}/generations",
+            headers=self.headers,
+            json={
+                "input_text": content,
+                "presentation_options": {
+                    "title": title,
+                    "slide_range": slide_range,
+                    "theme_id": theme
+                },
+                "export_formats": export_formats
+            }
+        )
+        response.raise_for_status()
+        result = response.json()
+
+        if wait:
+            return self.wait_for_completion(result["generation_id"], timeout)
+        return result
+
+    def wait_for_completion(self, generation_id: str, timeout: int = 300) -> dict:
+        """
+        Poll until a generation completes or fails.
+
+        Args:
+            generation_id: The ID returned from an async operation
+            timeout: Max seconds to wait
+
+        Returns:
+            Final generation status with results
+
+        Raises:
+            Exception: If generation fails
+            TimeoutError: If timeout exceeded
+        """
+        start = time.time()
+        while time.time() - start < timeout:
+            response = requests.get(
+                f"{self.base_url}/generations/{generation_id}",
+                headers=self.headers
+            )
+            response.raise_for_status()
+            result = response.json()
+
+            if result["status"] == "completed":
+                return result
+            elif result["status"] == "failed":
+                raise Exception(f"Generation failed: {result.get('error')}")
+
+            time.sleep(3)
+
+        raise TimeoutError(f"Generation {generation_id} timed out after {timeout}s")
+
+    def add_slide(
+        self,
+        presentation_id: str,
+        content: str,
+        instructions: str = None,
+        position: int = None,
+        wait: bool = True
+    ) -> dict:
+        """
+        Add a slide to an existing presentation.
+
+        Args:
+            presentation_id: ID of the presentation
+            content: Content for the new slide
+            instructions: Additional styling instructions
+            position: Slide position (None = append at end)
+            wait: If True, polls until completion
+
+        Returns:
+            Generation result with slide_id
+        """
+        payload = {
+            "slide_context": content,
+            "options": {}
+        }
+        if instructions:
+            payload["options"]["additional_instructions"] = instructions
+        if position is not None:
+            payload["options"]["slide_order"] = position
+
+        response = requests.post(
+            f"{self.base_url}/presentations/{presentation_id}/slides",
+            headers=self.headers,
+            json=payload
+        )
+        response.raise_for_status()
+        result = response.json()
+
+        if wait:
+            return self.wait_for_completion(result["generation_id"])
+        return result
+
+    def export(
+        self,
+        presentation_id: str,
+        formats: List[str] = None,
+        wait: bool = True
+    ) -> dict:
+        """
+        Export a presentation to specified formats.
+
+        Args:
+            presentation_id: ID of the presentation
+            formats: List of formats ["link", "pdf", "ppt"]
+            wait: If True, polls until completion
+
+        Returns:
+            Export result with download URLs
+        """
+        if formats is None:
+            formats = ["link", "pdf"]
+
+        response = requests.post(
+            f"{self.base_url}/presentations/{presentation_id}/exports",
+            headers=self.headers,
+            json={"formats": formats}
+        )
+        response.raise_for_status()
+        result = response.json()
+
+        if wait:
+            return self.wait_for_completion(result["generation_id"])
+        return result
+
+    def generate_transcripts(
+        self,
+        presentation_id: str,
+        slide_ids: List[str] = None,
+        wait: bool = True
+    ) -> dict:
+        """
+        Generate speaker notes for slides.
+
+        Args:
+            presentation_id: ID of the presentation
+            slide_ids: Specific slides (None = all slides)
+            wait: If True, polls until completion
+
+        Returns:
+            Transcripts for each slide
+        """
+        payload = {}
+        if slide_ids:
+            payload["slide_ids"] = slide_ids
+
+        response = requests.post(
+            f"{self.base_url}/presentations/{presentation_id}/transcripts",
+            headers=self.headers,
+            json=payload
+        )
+        response.raise_for_status()
+        result = response.json()
+
+        if wait:
+            return self.wait_for_completion(result["generation_id"])
+        return result
+
+    def upload_images(self, file_paths: List[str]) -> List[str]:
+        """
+        Upload images for use in presentations.
+
+        Args:
+            file_paths: List of local file paths
+
+        Returns:
+            List of image IDs to use in generation requests
+        """
+        files = [("files", open(path, "rb")) for path in file_paths]
+        response = requests.post(
+            f"{self.base_url}/upload-images",
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            files=files
+        )
+        response.raise_for_status()
+        return response.json()["image_ids"]
+
+    def delete_presentation(self, presentation_id: str) -> bool:
+        """Delete a presentation."""
+        response = requests.delete(
+            f"{self.base_url}/presentations/{presentation_id}",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json().get("success", False)
+
+    def delete_slide(self, presentation_id: str, slide_id: str) -> bool:
+        """Delete a slide from a presentation."""
+        response = requests.delete(
+            f"{self.base_url}/presentations/{presentation_id}/slides/{slide_id}",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json().get("success", False)
+```
+
+<Tip>
+  Save this as `alai_client.py` and import it in your projects: `from alai_client import AlaiClient`
+</Tip>
+
+---
+
+## Example 1: Generate a Simple Presentation
+
+The most basic use case - turn text into a presentation.
+
+```python
+from alai_client import AlaiClient
+
+client = AlaiClient("your_api_key")
+
+# Generate a presentation from text
+result = client.generate_presentation(
+    content="""
+    Introduction to Machine Learning
+
+    Machine learning is a subset of artificial intelligence that enables
+    systems to learn and improve from experience without being explicitly
+    programmed.
+
+    Key concepts:
+    - Supervised Learning: Learning from labeled data
+    - Unsupervised Learning: Finding patterns in unlabeled data
+    - Reinforcement Learning: Learning through trial and error
+
+    Applications include image recognition, natural language processing,
+    recommendation systems, and autonomous vehicles.
+    """,
+    title="Introduction to Machine Learning",
+    slide_range="6-10",
+    theme="NEBULA_DARK",
+    export_formats=["link", "pdf"]
+)
+
+print(f"View online: {result['formats']['link']['url']}")
+print(f"Download PDF: {result['formats']['pdf']['url']}")
+```
+
+---
+
+## Example 2: Weekly Report Generator
+
+Automate recurring presentations like weekly reports.
+
+```python
+from alai_client import AlaiClient
+from datetime import datetime
+
+client = AlaiClient("your_api_key")
+
+def generate_weekly_report(metrics: dict) -> dict:
+    """Generate a weekly report presentation from metrics."""
+
+    week_num = datetime.now().isocalendar()[1]
+    year = datetime.now().year
+
+    content = f"""
+    Weekly Business Report - Week {week_num}, {year}
+
+    Revenue Performance:
+    - Total Revenue: ${metrics['revenue']:,.0f}
+    - Week-over-Week Change: {metrics['revenue_change']:+.1f}%
+    - Year-to-Date: ${metrics['ytd_revenue']:,.0f}
+
+    Customer Metrics:
+    - New Customers: {metrics['new_customers']}
+    - Churn Rate: {metrics['churn_rate']:.1f}%
+    - Net Promoter Score: {metrics['nps']}
+
+    Top Products:
+    1. {metrics['top_products'][0]['name']} - ${metrics['top_products'][0]['revenue']:,.0f}
+    2. {metrics['top_products'][1]['name']} - ${metrics['top_products'][1]['revenue']:,.0f}
+    3. {metrics['top_products'][2]['name']} - ${metrics['top_products'][2]['revenue']:,.0f}
+
+    Key Highlights:
+    {chr(10).join(f"- {h}" for h in metrics['highlights'])}
+
+    Challenges & Action Items:
+    {chr(10).join(f"- {c}" for c in metrics['challenges'])}
+    """
+
+    return client.generate_presentation(
+        content=content,
+        title=f"Weekly Report - W{week_num}",
+        slide_range="6-10",
+        theme="LAPIS_DAWN",
+        export_formats=["link", "pdf", "ppt"]
+    )
+
+
+# Example usage
+metrics = {
+    "revenue": 1_250_000,
+    "revenue_change": 15.3,
+    "ytd_revenue": 45_000_000,
+    "new_customers": 47,
+    "churn_rate": 2.1,
+    "nps": 72,
+    "top_products": [
+        {"name": "Enterprise Plan", "revenue": 450_000},
+        {"name": "Team Plan", "revenue": 380_000},
+        {"name": "Starter Plan", "revenue": 370_000}
+    ],
+    "highlights": [
+        "Closed 3 enterprise deals worth $500K+",
+        "Product launch exceeded expectations by 40%",
+        "Customer satisfaction at all-time high"
+    ],
+    "challenges": [
+        "APAC region underperforming targets",
+        "Support ticket volume up 20%"
+    ]
+}
+
+result = generate_weekly_report(metrics)
+print(f"Report ready: {result['formats']['link']['url']}")
+```
+
+---
+
+## Example 3: Document to Slides
+
+Convert meeting notes, documents, or any text file into a presentation.
+
+```python
+from alai_client import AlaiClient
+
+client = AlaiClient("your_api_key")
+
+# Read content from a file
+with open("meeting_notes.txt", "r") as f:
+    notes = f.read()
+
+# Generate presentation
+result = client.generate_presentation(
+    content=notes,
+    title="Product Roadmap Review - Q1 Planning",
+    slide_range="11-15",
+    export_formats=["link", "ppt"]
+)
+
+print(f"Presentation: {result['formats']['link']['url']}")
+print(f"PowerPoint: {result['formats']['ppt']['url']}")
+```
+
+<Note>
+  The API automatically structures your content into logical slides. For best results, use clear headings and bullet points in your source text.
+</Note>
+
+---
+
+## Example 4: Add Slides to Existing Presentation
+
+Build presentations incrementally by adding slides one at a time.
+
+```python
+from alai_client import AlaiClient
+
+client = AlaiClient("your_api_key")
+
+# First, create a base presentation
+result = client.generate_presentation(
+    content="Company Overview: Founded in 2020, we build AI-powered tools.",
+    title="Company Overview",
+    slide_range="2-5"
+)
+
+presentation_id = result["presentation_id"]
+print(f"Created presentation: {presentation_id}")
+
+# Add a new slide with team information
+team_result = client.add_slide(
+    presentation_id=presentation_id,
+    content="""
+    Our Team:
+    - 50+ engineers across 3 continents
+    - Leadership from Google, Meta, and Amazon
+    - 60% of team has advanced degrees
+    """,
+    instructions="Use a team-focused layout with icons"
+)
+print(f"Added team slide: {team_result['slide_id']}")
+
+# Add another slide with metrics
+metrics_result = client.add_slide(
+    presentation_id=presentation_id,
+    content="""
+    Key Metrics:
+    - $10M ARR
+    - 500+ enterprise customers
+    - 99.9% uptime
+    - 4.8/5 customer rating
+    """,
+    instructions="Make it visually impactful with large numbers"
+)
+print(f"Added metrics slide: {metrics_result['slide_id']}")
+
+# Export the final presentation
+export = client.export(presentation_id, formats=["link", "pdf", "ppt"])
+print(f"Final presentation: {export['formats']['link']['url']}")
+```
+
+---
+
+## Example 5: Batch Processing
+
+Generate multiple presentations efficiently.
+
+```python
+from alai_client import AlaiClient
+from concurrent.futures import ThreadPoolExecutor
+
+client = AlaiClient("your_api_key")
+
+# Define multiple presentations to generate
+presentations = [
+    {
+        "title": "Q1 Financial Results",
+        "content": "Q1 revenue: $5M, growth: 25%, new customers: 150..."
+    },
+    {
+        "title": "Q2 Financial Results",
+        "content": "Q2 revenue: $6.2M, growth: 24%, new customers: 180..."
+    },
+    {
+        "title": "Q3 Financial Results",
+        "content": "Q3 revenue: $7.5M, growth: 21%, new customers: 200..."
+    },
+    {
+        "title": "Q4 Financial Results",
+        "content": "Q4 revenue: $9M, growth: 20%, new customers: 250..."
+    }
+]
+
+def generate_one(spec):
+    """Generate a single presentation."""
+    result = client.generate_presentation(
+        content=spec["content"],
+        title=spec["title"],
+        slide_range="6-10",
+        export_formats=["link", "pdf"]
+    )
+    return {
+        "title": spec["title"],
+        "url": result["formats"]["link"]["url"],
+        "pdf": result["formats"]["pdf"]["url"]
+    }
+
+# Process sequentially (recommended to stay within rate limits)
+results = []
+for spec in presentations:
+    print(f"Generating: {spec['title']}...")
+    result = generate_one(spec)
+    results.append(result)
+    print(f"  Done: {result['url']}")
+
+# Print summary
+print("\n=== All Presentations ===")
+for r in results:
+    print(f"{r['title']}: {r['url']}")
+```
+
+<Warning>
+  Respect the rate limit of 5 concurrent generations. For large batches, process sequentially or add delays between requests.
+</Warning>
+
+---
+
+## Example 6: Generate Speaker Notes
+
+Create talking points for your slides to help with presentations.
+
+```python
+from alai_client import AlaiClient
+
+client = AlaiClient("your_api_key")
+
+# Generate a presentation first
+result = client.generate_presentation(
+    content="""
+    AI in Healthcare
+
+    1. Early Disease Detection
+    - AI can detect cancer earlier than traditional methods
+    - 94% accuracy in detecting diabetic retinopathy
+
+    2. Drug Discovery
+    - Reduces development time from 10 years to 2-3 years
+    - Lower costs and faster trials
+
+    3. Personalized Treatment
+    - Treatment plans based on genetic profiles
+    - Better outcomes, fewer side effects
+    """,
+    title="AI in Healthcare",
+    slide_range="6-10"
+)
+
+presentation_id = result["presentation_id"]
+
+# Generate speaker notes for all slides
+transcripts = client.generate_transcripts(presentation_id)
+
+print("=== Speaker Notes ===\n")
+for slide in transcripts.get("transcripts", []):
+    print(f"Slide {slide['slide_order'] + 1}: {slide['title']}")
+    print(f"{slide['content']}\n")
+    print("-" * 50 + "\n")
+```
+
+---
+
+## Example 7: Presentations with Custom Images
+
+Upload your own images to include in presentations.
+
+```python
+from alai_client import AlaiClient
+
+client = AlaiClient("your_api_key")
+
+# Upload images first
+image_ids = client.upload_images([
+    "product_screenshot.png",
+    "team_photo.jpg",
+    "office_building.png"
+])
+print(f"Uploaded {len(image_ids)} images")
+
+# Generate presentation referencing uploaded images
+# Note: The API will intelligently incorporate your images
+result = client.generate_presentation(
+    content="""
+    About Our Company
+
+    Our Product:
+    A revolutionary AI-powered analytics platform that helps businesses
+    make data-driven decisions in real-time.
+
+    Our Team:
+    A diverse group of engineers, designers, and business experts
+    united by a passion for innovation.
+
+    Our Office:
+    Located in the heart of San Francisco, our modern workspace
+    fosters creativity and collaboration.
+    """,
+    title="About Our Company",
+    slide_range="6-10"
+)
+
+print(f"Presentation: {result['formats']['link']['url']}")
+```
+
+<Tip>
+  Supported image formats: PNG, JPEG, WebP, GIF, AVIF, SVG. Max 5MB per file, 10 images per upload.
+</Tip>
+
+---
+
+## Error Handling Best Practices
+
+Robust error handling for production use.
+
+```python
+from alai_client import AlaiClient
+import requests
+import time
+
+client = AlaiClient("your_api_key")
+
+def generate_with_retry(content: str, title: str, max_retries: int = 3) -> dict:
+    """Generate a presentation with automatic retry on failure."""
+
+    for attempt in range(max_retries):
+        try:
+            result = client.generate_presentation(
+                content=content,
+                title=title,
+                export_formats=["link"]
+            )
+            return result
+
+        except requests.exceptions.HTTPError as e:
+            status_code = e.response.status_code
+
+            if status_code == 401:
+                raise Exception("Invalid API key. Check your credentials.")
+
+            elif status_code == 402:
+                raise Exception("Insufficient credits. Please top up your account.")
+
+            elif status_code == 429:
+                # Rate limited - wait and retry
+                wait_time = 2 ** attempt * 5  # Exponential backoff
+                print(f"Rate limited. Waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+                continue
+
+            elif status_code >= 500:
+                # Server error - retry
+                wait_time = 2 ** attempt * 2
+                print(f"Server error. Waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+                continue
+
+            else:
+                raise
+
+        except TimeoutError:
+            if attempt < max_retries - 1:
+                print(f"Timeout. Retrying... ({attempt + 1}/{max_retries})")
+                continue
+            raise
+
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            raise
+
+    raise Exception(f"Failed after {max_retries} attempts")
+
+
+# Usage
+try:
+    result = generate_with_retry(
+        content="Your presentation content...",
+        title="My Presentation"
+    )
+    print(f"Success: {result['formats']['link']['url']}")
+
+except Exception as e:
+    print(f"Failed: {e}")
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="book" href="/api/generations">
+    Detailed documentation for all endpoints and parameters
+  </Card>
+  <Card title="Available Themes" icon="palette" href="/api/introduction#available-themes">
+    Browse all 12 professionally designed themes
+  </Card>
+</CardGroup>

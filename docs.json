@@ -14,6 +14,7 @@
         "group": "Alai API (Beta)",
         "pages": [
           "api/introduction",
+          "api/examples",
           {
             "group": "Presentations",
             "pages": [

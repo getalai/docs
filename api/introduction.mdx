@@ -1,10 +1,159 @@
 ---
 title: "Getting Started"
 sidebarTitle: "Introduction"
-description: "The Alai API enables you to programmatically generate presentations from text content. Generation operations are async - submit a request, get a generation ID, then poll for results."
+description: "Build AI-powered presentation generation into your applications with the Alai API."
 ---
 
-## How to get your API Key
+[Alai](https://www.getalai.com) transforms how teams create presentations. Instead of spending hours in PowerPoint, describe what you need and get professionally designed slides in seconds.
+
+The **Alai API** brings this power to your applications. Generate presentations programmatically, integrate with your workflows, and automate slide creation at scale.
+
+![API Introduction](/api_intro.gif)
+
+---
+
+## What You Can Build
+
+<CardGroup cols={2}>
+  <Card title="Generate Presentations" icon="wand-magic-sparkles">
+    Turn text, notes, or documents into complete slide decks with AI-powered design
+  </Card>
+  <Card title="Add & Edit Slides" icon="layer-plus">
+    Programmatically add new slides to existing presentations
+  </Card>
+  <Card title="Export Anywhere" icon="download">
+    Get shareable links, PDFs, or PowerPoint files
+  </Card>
+  <Card title="Speaker Notes" icon="microphone">
+    Auto-generate transcripts and talking points for each slide
+  </Card>
+</CardGroup>
+
+---
+
+## How It Works
+
+<Steps>
+  <Step title="Get Your API Key">
+    Sign up at [app.getalai.com](https://app.getalai.com) and generate an API key from your account settings.
+  </Step>
+  <Step title="Submit Your Content">
+    POST to `/generations` with your text content. You'll receive a `generation_id` immediately.
+  </Step>
+  <Step title="Poll for Completion">
+    Check `GET /generations/{id}` every few seconds until status is `completed`.
+  </Step>
+  <Step title="Access Your Presentation">
+    Get shareable links, download PDFs, or export to PowerPoint from the response.
+  </Step>
+</Steps>
+
+---
+
+## Quick Example
+
+<CodeGroup>
+
+```python Python
+import requests
+import time
+
+API_KEY = "your_api_key"
+BASE_URL = "https://slides-api.getalai.com/api/v1"
+
+# 1. Generate presentation
+response = requests.post(
+    f"{BASE_URL}/generations",
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    json={
+        "input_text": "Q4 revenue grew 25%. Key wins: Enterprise deals and product launches.",
+        "presentation_options": {"title": "Q4 Results", "slide_range": "6-10"},
+        "export_formats": ["link", "pdf"]
+    }
+)
+generation_id = response.json()["generation_id"]
+
+# 2. Poll until complete
+while True:
+    status = requests.get(
+        f"{BASE_URL}/generations/{generation_id}",
+        headers={"Authorization": f"Bearer {API_KEY}"}
+    ).json()
+
+    if status["status"] == "completed":
+        print(f"View: {status['formats']['link']['url']}")
+        print(f"PDF: {status['formats']['pdf']['url']}")
+        break
+    elif status["status"] == "failed":
+        raise Exception(status.get("error"))
+
+    time.sleep(3)
+```
+
+```bash cURL
+# 1. Generate presentation
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Q4 revenue grew 25%. Key wins: Enterprise deals and product launches.",
+    "presentation_options": {"title": "Q4 Results", "slide_range": "6-10"},
+    "export_formats": ["link", "pdf"]
+  }'
+
+# Response: {"generation_id": "abc123-..."}
+
+# 2. Poll for status
+curl "https://slides-api.getalai.com/api/v1/generations/abc123-..." \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```javascript JavaScript
+const API_KEY = "your_api_key";
+const BASE_URL = "https://slides-api.getalai.com/api/v1";
+
+// 1. Generate presentation
+const response = await fetch(`${BASE_URL}/generations`, {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    input_text: "Q4 revenue grew 25%. Key wins: Enterprise deals and product launches.",
+    presentation_options: { title: "Q4 Results", slide_range: "6-10" },
+    export_formats: ["link", "pdf"]
+  })
+});
+const { generation_id } = await response.json();
+
+// 2. Poll until complete
+const poll = async () => {
+  while (true) {
+    const res = await fetch(`${BASE_URL}/generations/${generation_id}`, {
+      headers: { "Authorization": `Bearer ${API_KEY}` }
+    });
+    const status = await res.json();
+
+    if (status.status === "completed") {
+      console.log("View:", status.formats.link.url);
+      console.log("PDF:", status.formats.pdf.url);
+      return status;
+    } else if (status.status === "failed") {
+      throw new Error(status.error);
+    }
+
+    await new Promise(r => setTimeout(r, 3000));
+  }
+};
+await poll();
+```
+
+</CodeGroup>
+
+---
+
+## Get Your API Key
 
 1. **Sign up** at [app.getalai.com](https://app.getalai.com)
 2. **Click on your name** in the left sidebar
@@ -13,48 +162,23 @@ description: "The Alai API enables you to programmatically generate presentation
 5. **Copy and securely store** your API key
 
 <Warning>
-  Keep your API key secure and never share it publicly.
+  Keep your API key secure and never share it publicly. Treat it like a password.
 </Warning>
-
-![API Introduction](/api_intro.gif)
-
----
-
-## Base URL
-
-```
-https://slides-api.getalai.com/api/v1
-```
 
 ---
 
 ## Authentication
 
-Include your API key as a Bearer token in the `Authorization` header:
+All requests require a Bearer token in the `Authorization` header:
 
 ```bash
 Authorization: Bearer YOUR_API_KEY
 ```
 
----
-
-## Async Workflow
-
-All generation operations are **asynchronous**. Here's the typical flow:
-
+**Base URL:**
 ```
-1. POST /generations          → Returns { generation_id }
-2. GET /generations/{id}      → Poll until status is "completed" or "failed"
-3. Access results             → URLs available in the response
+https://slides-api.getalai.com/api/v1
 ```
-
-**Status values:**
-- `pending` - Queued, not yet started
-- `in_progress` - Currently processing
-- `completed` - Finished; results available
-- `failed` - Error occurred; check `error` field
-
-**Recommended polling:** Every 2-5 seconds. Most generations complete within 30-120 seconds.
 
 ---
 
@@ -65,69 +189,38 @@ These endpoints return a `generation_id`. Poll `GET /generations/{id}` until com
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/generations` | POST | Generate a presentation |
+| `/generations` | POST | Generate a presentation from text |
 | `/presentations/{id}/slides` | POST | Add a slide to a presentation |
-| `/presentations/{id}/exports` | POST | Export presentation to PDF/PPT |
-| `/presentations/{id}/transcripts` | POST | Generate slide transcripts |
+| `/presentations/{id}/exports` | POST | Export to PDF, PPT, or shareable link |
+| `/presentations/{id}/transcripts` | POST | Generate speaker notes |
 
 ### Synchronous Operations
 These endpoints return results immediately.
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/ping` | GET | Verify API key |
+| `/ping` | GET | Verify your API key |
 | `/generations/{id}` | GET | Check generation status |
-| `/upload-images` | POST | Upload images for use in presentations |
+| `/upload-images` | POST | Upload images for presentations |
 | `/presentations/{id}/slides/{slide_id}` | DELETE | Delete a slide |
 | `/presentations/{id}` | DELETE | Delete a presentation |
 
 ---
 
-## Quick Start
+## Generation Status
 
-### 1. Generate a Presentation
+When polling, you'll see one of these status values:
 
-```bash
-curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input_text": "Quarterly sales increased 25% YoY. Key drivers: enterprise growth and new product launches.",
-    "presentation_options": {
-      "title": "Q4 Sales Report",
-      "slide_range": "6-10"
-    }
-  }'
-```
+| Status | Description |
+|--------|-------------|
+| `pending` | Queued, not yet started |
+| `in_progress` | Currently processing |
+| `completed` | Finished successfully |
+| `failed` | Error occurred (check `error` field) |
 
-**Response:**
-```json
-{
-  "generation_id": "abc123-def456-..."
-}
-```
-
-### 2. Poll for Status
-
-```bash
-curl "https://slides-api.getalai.com/api/v1/generations/abc123-def456-..." \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-**Response (when completed):**
-```json
-{
-  "generation_id": "abc123-def456-...",
-  "status": "completed",
-  "presentation_id": "xyz789-...",
-  "formats": {
-    "link": {
-      "status": "completed",
-      "url": "https://app.getalai.com/view/..."
-    }
-  }
-}
-```
+<Tip>
+  Poll every 2-5 seconds. Most generations complete within 30-120 seconds.
+</Tip>
 
 ---
 
@@ -135,14 +228,27 @@ curl "https://slides-api.getalai.com/api/v1/generations/abc123-def456-..." \
 
 Choose from 12 professionally designed themes:
 
-`NEBULA_DARK`, `AMETHYST_LIGHT` (default), `FLAT_WHITE`, `DESERT_BLOOM`, `LAPIS_DAWN`, `EMERALD_FOREST`, `COSMIC_THREAD`, `DONUT`, `OAK`, `OBSIDIAN_FLOW`, `MIDNIGHT_EMBER`, `AURORA_FLUX`
+| Theme | Style |
+|-------|-------|
+| `AMETHYST_LIGHT` | Light purple, modern (default) |
+| `NEBULA_DARK` | Dark blue, professional |
+| `FLAT_WHITE` | Clean, minimalist |
+| `DESERT_BLOOM` | Warm, earthy tones |
+| `LAPIS_DAWN` | Blue gradient, corporate |
+| `EMERALD_FOREST` | Green, natural |
+| `COSMIC_THREAD` | Dark, cosmic |
+| `DONUT` | Playful, colorful |
+| `OAK` | Warm wood tones |
+| `OBSIDIAN_FLOW` | Dark, sleek |
+| `MIDNIGHT_EMBER` | Dark with red accents |
+| `AURORA_FLUX` | Gradient, dynamic |
 
 ---
 
 ## Rate Limits
 
 - **Max 5 concurrent generations** per user
-- Polling recommended every 2-5 seconds
+- Recommended polling interval: 2-5 seconds
 
 ---
 
@@ -154,12 +260,12 @@ Choose from 12 professionally designed themes:
 | `400` | Bad Request - Invalid parameters |
 | `401` | Unauthorized - Invalid or missing API key |
 | `402` | Payment Required - Insufficient credits |
-| `404` | Not Found - Resource not found |
-| `422` | Validation Error |
+| `404` | Not Found - Resource doesn't exist |
+| `422` | Validation Error - Check request body |
 | `429` | Rate limit exceeded |
 | `500` | Internal Server Error |
 
-Error responses include a `message` field:
+Error responses include details:
 
 ```json
 {
@@ -167,3 +273,16 @@ Error responses include a `message` field:
   "status_code": 400
 }
 ```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Examples & Use Cases" icon="code" href="/api/examples">
+    Complete Python examples with a helper client class
+  </Card>
+  <Card title="Generate Presentation" icon="sparkles" href="/api/generations">
+    Full API reference for presentation generation
+  </Card>
+</CardGroup>
