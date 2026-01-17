@@ -1,13 +1,125 @@
 ---
-title: "Playground"
-openapi: "POST /generations"
+title: "Generate Presentation"
+openapi: "POST /api/v1/generations"
 ---
 
-## Using the Playground
+Generate a presentation from text content. This is an **async operation** - you receive a `generation_id` immediately and poll for results.
 
-The request body accepts a JSON object containing all your generation options.
+## Workflow
+
+1. **Submit** your content with `POST /generations`
+2. **Receive** a `generation_id` immediately
+3. **Poll** `GET /generations/{generation_id}` until `status` is `completed` or `failed`
+4. **Access** your presentation via URLs in the `formats` field
+
+---
+
+## Request Body
+
+### Required
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `input_text` | string | Content to transform into slides. Can be plain text, markdown, or structured notes. |
+
+### Export Formats
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `export_formats` | array | `["link"]` | Formats to export: `link`, `pdf`, `ppt`. Can request multiple. |
+
+### Presentation Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `presentation_options.title` | string | "API Generated Presentation" | Title shown on title slide and in exports |
+| `presentation_options.theme_id` | string | "AMETHYST_LIGHT" | Visual theme (see available themes) |
+| `presentation_options.slide_range` | string | "auto" | Target slide count: `auto`, `1`, `2-5`, `6-10`, `11-15`, `16-20`, `21-25`, `26-50` |
+| `presentation_options.existing_presentation_id` | string | - | Append slides to existing presentation |
+| `presentation_options.total_variants_per_slide` | integer | 1 | Variants per slide (1-4) |
+
+### Text Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `text_options.language` | string | (auto) | Output language |
+| `text_options.tone` | string | "DEFAULT" | Writing style: `DEFAULT`, `PROFESSIONAL`, `CASUAL`, `TECHNICAL`, `EDUCATIONAL`, `INSPIRATIONAL`, `NARRATIVE`, `PERSUASIVE`, `AUTHORITATIVE`, `EMPATHETIC`, `CUSTOM` |
+| `text_options.tone_instructions` | string | - | Required when tone is `CUSTOM` |
+| `text_options.content_mode` | string | "PRESERVE" | How to handle input: `PRESERVE`, `CONDENSE`, `ENHANCE`, `CUSTOM` |
+| `text_options.amount_mode` | string | "ESSENTIAL" | Text density: `MINIMAL`, `ESSENTIAL`, `BALANCED`, `DETAILED`, `CUSTOM` |
+
+### Image Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image_options.include_ai_images` | boolean | true | Generate AI images |
+| `image_options.style` | string | "auto" | Image style: `auto`, `realistic`, `artistic`, `cartoon`, `three_d`, `custom` |
+| `image_options.style_instructions` | string | - | Required when style is `custom` |
+| `image_options.num_image_variants` | integer | 0 | Image slide variants (0-2) |
+
+---
+
+## Response
+
+```json
+{
+  "generation_id": "abc123-def456-789..."
+}
+```
+
+Use this `generation_id` to poll `GET /generations/{generation_id}` for status.
+
+---
+
+## Examples
+
+### Basic Generation
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Our company achieved 25% revenue growth this quarter."
+  }'
+```
+
+### With Multiple Export Formats
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Quarterly sales report content...",
+    "export_formats": ["link", "pdf", "ppt"],
+    "presentation_options": {
+      "title": "Q4 Sales Report",
+      "theme_id": "NEBULA_DARK",
+      "slide_range": "6-10"
+    },
+    "text_options": {
+      "tone": "PROFESSIONAL"
+    }
+  }'
+```
+
+### Add to Existing Presentation
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Additional slides content...",
+    "presentation_options": {
+      "existing_presentation_id": "xyz789-...",
+      "slide_range": "2-5"
+    }
+  }'
+```
 
 <Tip>
-  Only `input_text` is required. All other options have sensible defaults, so
-  you can start simple and add customization as needed.
+  Request multiple `export_formats` in a single call to get link, PDF, and PPT
+  all at once. Check the `formats` object in the status response for download URLs.
 </Tip>

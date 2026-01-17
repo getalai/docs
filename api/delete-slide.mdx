@@ -1,0 +1,46 @@
+---
+title: "Delete Slide"
+openapi: "DELETE /api/v1/presentations/{presentation_id}/slides/{slide_id}"
+---
+
+Delete a slide from a presentation. This is a synchronous operation.
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `presentation_id` | string | ID of the presentation |
+| `slide_id` | string | ID of the slide to delete |
+
+---
+
+## Response
+
+```json
+{
+  "success": true
+}
+```
+
+---
+
+## Example
+
+```bash
+curl -X DELETE "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../slides/slide123-..." \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| 400 | Slide doesn't belong to the presentation |
+| 401 | Invalid or missing API key |
+| 404 | Presentation or slide not found |
+
+<Warning>
+  This action is permanent. Deleted slides cannot be recovered.
+</Warning>

@@ -1,0 +1,77 @@
+---
+title: "Export Presentation"
+openapi: "POST /api/v1/presentations/{presentation_id}/exports"
+---
+
+Export an existing presentation to PDF, PPT, or get a shareable link. This is an **async operation**.
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `presentation_id` | string | ID of the presentation to export |
+
+---
+
+## Request Body
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `formats` | array | `["link"]` | Formats to export: `link`, `pdf`, `ppt` |
+
+---
+
+## Response
+
+```json
+{
+  "generation_id": "abc123-def456-..."
+}
+```
+
+Poll `GET /generations/{generation_id}` until status is `completed`.
+
+---
+
+## Example
+
+### Export to Multiple Formats
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../exports" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "formats": ["link", "pdf", "ppt"]
+  }'
+```
+
+### Status Response
+
+```json
+{
+  "generation_id": "abc123-...",
+  "generation_type": "presentation_export",
+  "status": "completed",
+  "presentation_id": "xyz789-...",
+  "formats": {
+    "link": {
+      "status": "completed",
+      "url": "https://app.getalai.com/view/..."
+    },
+    "pdf": {
+      "status": "completed",
+      "url": "https://storage.../presentation.pdf"
+    },
+    "ppt": {
+      "status": "completed",
+      "url": "https://storage.../presentation.pptx"
+    }
+  }
+}
+```
+
+<Tip>
+  Download URLs are signed and valid for 24 hours. Download promptly or
+  call this endpoint again to get fresh URLs.
+</Tip>

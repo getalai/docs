@@ -1,270 +1,160 @@
 ---
-title: "How to get started with Alai API"
+title: "Getting Started"
 sidebarTitle: "Introduction"
-description: "The Alai API enables you to transform text content into fully designed presentations. Simply provide your content, customize the style and tone preferences, and receive a presentation link."
+description: "The Alai API enables you to programmatically generate presentations from text content. All operations are async - submit a request, get a generation ID, then poll for results."
 ---
 
-# How to get your API Key
-
-Before you can use the Alai API, you'll need to generate an API key:
+## How to get your API Key
 
 1. **Sign up** at [app.getalai.com](https://app.getalai.com)
 2. **Click on your name** in the left sidebar
 3. **Select "API"** from the dropdown menu
 4. **Click "Add new API key"** to generate your key
-5. **Copy and securely store** your API key - you'll need it for authentication
+5. **Copy and securely store** your API key
 
 <Warning>
-  Keep your API key secure and never share it publicly. Treat it like a
-  password.
+  Keep your API key secure and never share it publicly.
 </Warning>
 
 ![API Introduction](/api_intro.gif)
 
 ---
 
-## OpenAPI Schema
+## Base URL
+
+```
+https://slides-api.getalai.com/api/v1
+```
+
+---
+
+## Authentication
+
+Include your API key as a Bearer token in the `Authorization` header:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+---
+
+## Async Workflow
+
+All generation operations are **asynchronous**. Here's the typical flow:
+
+```
+1. POST /generations          → Returns { generation_id }
+2. GET /generations/{id}      → Poll until status is "completed" or "failed"
+3. Access results             → URLs available in the response
+```
+
+**Status values:**
+- `pending` - Queued, not yet started
+- `in_progress` - Currently processing
+- `completed` - Finished; results available
+- `failed` - Error occurred; check `error` field
+
+**Recommended polling:** Every 2-5 seconds. Most generations complete within 30-120 seconds.
+
+---
+
+## Available Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/ping` | GET | Verify API key |
+| `/generations` | POST | Generate a presentation |
+| `/generations/{id}` | GET | Check generation status |
+| `/upload-images` | POST | Upload images for use in presentations |
+| `/presentations/{id}/slides` | POST | Add a slide to a presentation |
+| `/presentations/{id}/slides/{slide_id}` | DELETE | Delete a slide |
+| `/presentations/{id}/exports` | POST | Export presentation to PDF/PPT |
+| `/presentations/{id}/transcripts` | POST | Generate slide transcripts |
+| `/presentations/{id}` | DELETE | Delete a presentation |
+
+---
+
+## Quick Start
+
+### 1. Generate a Presentation
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Quarterly sales increased 25% YoY. Key drivers: enterprise growth and new product launches.",
+    "presentation_options": {
+      "title": "Q4 Sales Report",
+      "slide_range": "6-10"
+    }
+  }'
+```
+
+**Response:**
+```json
+{
+  "generation_id": "abc123-def456-..."
+}
+```
+
+### 2. Poll for Status
+
+```bash
+curl "https://slides-api.getalai.com/api/v1/generations/abc123-def456-..." \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Response (when completed):**
+```json
+{
+  "generation_id": "abc123-def456-...",
+  "status": "completed",
+  "presentation_id": "xyz789-...",
+  "formats": {
+    "link": {
+      "status": "completed",
+      "url": "https://app.getalai.com/view/..."
+    }
+  }
+}
+```
+
+---
+
+## Available Themes
+
+Choose from 12 professionally designed themes:
+
+`NEBULA_DARK`, `AMETHYST_LIGHT` (default), `FLAT_WHITE`, `DESERT_BLOOM`, `LAPIS_DAWN`, `EMERALD_FOREST`, `COSMIC_THREAD`, `DONUT`, `OAK`, `OBSIDIAN_FLOW`, `MIDNIGHT_EMBER`, `AURORA_FLUX`
+
+---
+
+## Rate Limits
+
+- **Max 5 concurrent generations** per user
+- Polling recommended every 2-5 seconds
+
+---
+
+## Error Handling
+
+| Code | Description |
+|------|-------------|
+| `200` | Success |
+| `400` | Bad Request - Invalid parameters |
+| `401` | Unauthorized - Invalid or missing API key |
+| `402` | Payment Required - Insufficient credits |
+| `404` | Not Found - Resource not found |
+| `422` | Validation Error |
+| `429` | Rate limit exceeded |
+| `500` | Internal Server Error |
+
+Error responses include a `message` field:
 
 ```json
 {
-  "openapi": "3.0.3",
-  "info": {
-    "title": "Alai API",
-    "description": "Transform text content into fully designed presentations",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://slides-api.getalai.com/api/v1"
-    }
-  ],
-  "paths": {
-    "/generations": {
-      "post": {
-        "summary": "Generate a presentation",
-        "description": "Creates a new presentation from the provided text content and customization options.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["input_text"],
-                "properties": {
-                  "input_text": {
-                    "type": "string",
-                    "description": "The main content that drives your presentation generation. This text forms the foundation of all slides created.",
-                    "example": "Quarterly sales increased 25% YoY. Key drivers: enterprise segment growth, new product launches, expanded market reach."
-                  },
-                  "additional_instructions": {
-                    "type": "string",
-                    "description": "Custom generation instructions for AI that fine-tune how content is delivered on the presentation.",
-                    "example": "Make it infographic"
-                  },
-                  "presentation_options": {
-                    "type": "object",
-                    "description": "Options for presentation appearance and structure",
-                    "properties": {
-                      "title": {
-                        "type": "string",
-                        "description": "Sets the title displayed in your presentation.",
-                        "example": "Q4 2024 Sales Report"
-                      },
-                      "theme_id": {
-                        "type": "string",
-                        "enum": ["NEBULA_DARK", "AMETHYST_LIGHT", "FLAT_WHITE", "DESERT_BLOOM", "LAPIS_DAWN", "EMERALD_FOREST", "COSMIC_THREAD", "DONUT", "OAK", "OBSIDIAN_FLOW", "MIDNIGHT_EMBER", "AURORA_FLUX"],
-                        "description": "Defines which theme from Alai will be used for presentation.",
-                        "default": "AMETHYST_LIGHT",
-                        "example": "AMETHYST_LIGHT"
-                      },
-                      "slide_range": {
-                        "type": "string",
-                        "enum": ["auto", "1", "2-5", "6-10", "11-15", "16-20", "21-25"],
-                        "description": "Controls the target number of slides generated from your content.",
-                        "default": "6-10",
-                        "example": "6-10"
-                      },
-                      "choices_per_slide": {
-                        "type": "integer",
-                        "enum": [1, 2, 3, 4],
-                        "description": "The number of slide variants to generate per slide (1-4).",
-                        "default": 1,
-                        "example": 1
-                      },
-                      "export_as": {
-                        "type": "string",
-                        "enum": ["link", "id", "pdf", "ppt"],
-                        "description": "Controls the response format. `link` waits for completion and returns the presentation URL. `id` returns immediately with the presentation ID while generation continues in background. `pdf` waits for completion and returns the presentation as a PDF file.",
-                        "default": "link",
-                        "example": "link"
-                      }
-                    }
-                  },
-                  "text_options": {
-                    "type": "object",
-                    "description": "Options for text content generation",
-                    "properties": {
-                      "language": {
-                        "type": "string",
-                        "enum": [
-                          "English (US)",
-                          "English (UK)",
-                          "Spanish (Latin America)",
-                          "Spanish (Mexico)",
-                          "Spanish (Spain)",
-                          "French",
-                          "German",
-                          "Italian",
-                          "Portuguese (Brazil)",
-                          "Portuguese (Portugal)",
-                          "Dutch",
-                          "Polish",
-                          "Russian",
-                          "Japanese",
-                          "Korean",
-                          "Chinese (Simplified)",
-                          "Hindi",
-                          "Swedish",
-                          "Norwegian",
-                          "Danish",
-                          "Finnish",
-                          "Greek",
-                          "Turkish",
-                          "Czech",
-                          "Hungarian",
-                          "Romanian",
-                          "Bulgarian",
-                          "Ukrainian",
-                          "Vietnamese",
-                          "Thai",
-                          "Indonesian"
-                        ],
-                        "description": "Specifies the language for generated content and AI-generated elements.",
-                        "default": "English (US)",
-                        "example": "English (US)"
-                      },
-                      "tone": {
-                        "type": "string",
-                        "enum": ["DEFAULT", "PROFESSIONAL", "CASUAL", "TECHNICAL", "EDUCATIONAL", "INSPIRATIONAL", "NARRATIVE", "PERSUASIVE", "AUTHORITATIVE", "EMPATHETIC", "CUSTOM"],
-                        "description": "Defines the writing voice, style, and perspective applied to generated content.",
-                        "default": "PROFESSIONAL",
-                        "example": "PROFESSIONAL"
-                      },
-                      "tone_instructions": {
-                        "type": "string",
-                        "description": "Custom tone directives when no preset tone matches your needs. Set only when tone is CUSTOM."
-                      },
-                      "content_mode": {
-                        "type": "string",
-                        "enum": ["preserve", "enhance", "condense", "custom"],
-                        "description": "Controls how input text is processed and adapted for presentation format.",
-                        "default": "preserve",
-                        "example": "preserve"
-                      },
-                      "content_instructions": {
-                        "type": "string",
-                        "description": "Custom directives for text processing when no preset mode fits. Set only when content_mode is custom."
-                      },
-                      "amount_mode": {
-                        "type": "string",
-                        "enum": ["minimal", "essential", "balanced", "detailed", "custom"],
-                        "description": "Controls the density of text appearing on each slide.",
-                        "default": "essential",
-                        "example": "essential"
-                      },
-                      "amount_instructions": {
-                        "type": "string",
-                        "description": "Custom text density directives for specialized requirements. Set only when amount_mode is custom."
-                      }
-                    }
-                  },
-                  "image_options": {
-                    "type": "object",
-                    "description": "Options for AI-generated images",
-                    "properties": {
-                      "include_ai_images": {
-                        "type": "string",
-                        "enum": ["true", "false"],
-                        "description": "Whether to generate AI-powered illustrations alongside your content.",
-                        "default": "true",
-                        "example": "true"
-                      },
-                      "style": {
-                        "type": "string",
-                        "enum": ["auto", "realistic", "artistic", "cartoon", "three_d", "custom"],
-                        "description": "Controls the visual style of AI-generated images.",
-                        "default": "auto",
-                        "example": "auto"
-                      },
-                      "style_instructions": {
-                        "type": "string",
-                        "description": "Custom image generation directives for specialized visual requirements. Set only when style is custom."
-                      }
-                    }
-                  },
-                  "image_urls": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "description": "Array of image URLs to include in the presentation. These images will be used alongside or instead of AI-generated images.",
-                    "example": ["https://example.com/image1.png", "https://example.com/image2.jpg"]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Presentation generated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "presentation_url": {
-                      "type": "string",
-                      "format": "uri",
-                      "description": "Direct URL to view the generated presentation",
-                      "example": "https://app.getalai.com/presentation/<uuid>"
-                    },
-                    "presentation_id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "description": "Unique identifier for the presentation",
-                      "example": "<uuid>"
-                    }
-                  },
-                  "required": ["presentation_url", "presentation_id"]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Invalid or missing API key"
-          },
-          "400": {
-            "description": "Bad Request - Invalid parameters"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "API key passed as Bearer token"
-      }
-    }
-  }
+  "message": "Error description",
+  "status_code": 400
 }
 ```

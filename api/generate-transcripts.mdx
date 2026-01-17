@@ -1,0 +1,89 @@
+---
+title: "Generate Transcripts"
+openapi: "POST /api/v1/presentations/{presentation_id}/transcripts"
+---
+
+Generate speaker notes/transcripts for slides using AI. This is an **async operation**.
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `presentation_id` | string | ID of the presentation |
+
+---
+
+## Request Body
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `slide_ids` | array | (all slides) | Specific slide IDs to generate transcripts for. If omitted, generates for all slides. |
+
+---
+
+## Response
+
+```json
+{
+  "generation_id": "abc123-def456-..."
+}
+```
+
+Poll `GET /generations/{generation_id}` until status is `completed`.
+
+---
+
+## Example
+
+### All Slides
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../transcripts" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### Specific Slides
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../transcripts" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "slide_ids": ["slide1-...", "slide2-..."]
+  }'
+```
+
+---
+
+## Status Response
+
+```json
+{
+  "generation_id": "abc123-...",
+  "generation_type": "transcript_generation",
+  "status": "completed",
+  "presentation_id": "xyz789-...",
+  "transcripts": [
+    {
+      "slide_id": "slide1-...",
+      "slide_order": 0,
+      "title": "Introduction",
+      "content": "Welcome everyone. Today we'll be discussing...",
+      "layout": "TITLE_SLIDE"
+    },
+    {
+      "slide_id": "slide2-...",
+      "slide_order": 1,
+      "title": "Key Metrics",
+      "content": "Let's look at our performance this quarter...",
+      "layout": "CONTENT_SLIDE"
+    }
+  ]
+}
+```
+
+<Note>
+  Transcript generation uses credits. The cost is based on the number of slides processed.
+</Note>

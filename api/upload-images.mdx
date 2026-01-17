@@ -1,0 +1,84 @@
+---
+title: "Upload Images"
+openapi: "POST /api/v1/upload-images"
+---
+
+Upload images for use in presentation generation. Returns image IDs that can be referenced via `image_urls` in subsequent requests.
+
+## Limits
+
+- **Max file size:** 5MB per image
+- **Max images:** 10 per request
+- **Supported formats:** PNG, JPEG, WebP, GIF, AVIF, SVG
+
+---
+
+## Request
+
+Send images as `multipart/form-data` with field name `files`.
+
+### curl
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/upload-images" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F "files=@/path/to/image1.png" \
+  -F "files=@/path/to/image2.jpg"
+```
+
+### Python
+
+```python
+import requests
+
+url = "https://slides-api.getalai.com/api/v1/upload-images"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+
+files = [
+    ("files", ("image1.png", open("image1.png", "rb"), "image/png")),
+    ("files", ("image2.jpg", open("image2.jpg", "rb"), "image/jpeg")),
+]
+
+response = requests.post(url, headers=headers, files=files)
+print(response.json())
+```
+
+### JavaScript
+
+```javascript
+const formData = new FormData();
+formData.append('files', file1);
+formData.append('files', file2);
+
+const response = await fetch('https://slides-api.getalai.com/api/v1/upload-images', {
+  method: 'POST',
+  headers: { 'Authorization': 'Bearer YOUR_API_KEY' },
+  body: formData
+});
+
+const data = await response.json();
+console.log(data.image_ids);
+```
+
+---
+
+## Response
+
+```json
+{
+  "image_ids": [
+    "123e4567-e89b-12d3-a456-426614174000",
+    "987fcdeb-51a2-3c4d-e5f6-789012345678"
+  ]
+}
+```
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| 400 | File too large or too many images |
+| 401 | Invalid or missing API key |
+| 415 | Unsupported file type |

@@ -14,7 +14,24 @@
         "group": "Alai API (Beta)",
         "pages": [
           "api/introduction",
-          "api/generations"
+          {
+            "group": "Presentations",
+            "pages": [
+              "api/generations",
+              "api/generation-status",
+              "api/export-presentation",
+              "api/generate-transcripts",
+              "api/delete-presentation"
+            ]
+          },
+          {
+            "group": "Slides",
+            "pages": [
+              "api/create-slide",
+              "api/delete-slide"
+            ]
+          },
+          "api/upload-images"
         ]
       }
     ]

@@ -1,23 +1,145 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Alai API",
-    "description": "Transform text content into fully designed presentations",
+    "description": "API endpoints for programmatic access to Alai presentation generation",
     "version": "1.0.0"
   },
-  "servers": [
-    {
-      "url": "https://slides-api.getalai.com/api/v1"
-    }
-  ],
   "paths": {
-    "/generations": {
+    "/api/v1/ping": {
+      "get": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Verify API key",
+        "description": "Validates your API key and returns your user ID. Use this to test authentication before making other requests.",
+        "operationId": "ping_api_v1_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/upload-images": {
       "post": {
-        "summary": "Generate a presentation",
-        "description": "Creates a new presentation from the provided text content and customization options.",
-        "security": [
+        "tags": [
+          "External API"
+        ],
+        "summary": "Upload images for use in presentations",
+        "description": "Upload images to be used in presentation generation. Returns image IDs that can be referenced in subsequent requests.\n\n**Limits:** Max 10 images per request, 5MB per file. Supported formats: PNG, JPEG, WebP, GIF, AVIF, SVG.",
+        "operationId": "upload_images_api_v1_upload_images_post",
+        "parameters": [
           {
-            "bearerAuth": []
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_images_api_v1_upload_images_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/generations": {
+      "post": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Generate a presentation",
+        "description": "Create a new presentation from text content. This is an async operation.\n\n**Workflow:**\n1. Submit your content and options\n2. Receive a `generation_id` immediately\n3. Poll `GET /generations/{generation_id}` until status is `completed` or `failed`\n4. Access your presentation via the URLs in the response\n\n**Rate limit:** Max 5 concurrent generations per user.",
+        "operationId": "generate_presentation_api_v1_generations_post",
+        "parameters": [
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
           }
         ],
         "requestBody": {
@@ -25,218 +147,1572 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": ["input_text"],
-                "properties": {
-                  "input_text": {
-                    "type": "string",
-                    "description": "The main content that drives your presentation generation. This text forms the foundation of all slides created.",
-                    "example": "Quarterly sales increased 25% YoY. Key drivers: enterprise segment growth, new product launches, expanded market reach."
-                  },
-                  "additional_instructions": {
-                    "type": "string",
-                    "description": "Custom generation instructions for AI that fine-tune how content is delivered on the presentation.",
-                    "default": "",
-                    "example": "Make it infographic"
-                  },
-                  "presentation_options": {
-                    "type": "object",
-                    "description": "Options for presentation appearance and structure",
-                    "properties": {
-                      "title": {
-                        "type": "string",
-                        "description": "Sets the title displayed in your presentation.",
-                        "example": "Q4 2024 Sales Report"
-                      },
-                      "theme_id": {
-                        "type": "string",
-                        "enum": ["NEBULA_DARK", "AMETHYST_LIGHT", "FLAT_WHITE", "DESERT_BLOOM", "LAPIS_DAWN", "EMERALD_FOREST", "COSMIC_THREAD", "DONUT", "OAK", "OBSIDIAN_FLOW", "MIDNIGHT_EMBER", "AURORA_FLUX"],
-                        "description": "Defines which theme from Alai will be used for presentation.",
-                        "default": "AMETHYST_LIGHT",
-                        "example": "AMETHYST_LIGHT"
-                      },
-                      "slide_range": {
-                        "type": "string",
-                        "enum": ["auto", "1", "2-5", "6-10", "11-15", "16-20", "21-25"],
-                        "description": "Controls the target number of slides generated from your content.",
-                        "default": "6-10",
-                        "example": "6-10"
-                      },
-                      "choices_per_slide": {
-                        "type": "integer",
-                        "enum": [1, 2, 3, 4],
-                        "description": "The number of slide variants to generate per slide (1-4).",
-                        "default": 1,
-                        "example": 1
-                      },
-                      "export_as": {
-                        "type": "string",
-                        "enum": ["link", "id", "pdf", "ppt"],
-                        "description": "Controls the response format. `link` waits for completion and returns the presentation URL. `id` returns immediately with the presentation ID while generation continues in background. `pdf` / `ppt` waits for completion and returns the presentation as a PDF or PPT file.",
-                        "default": "link",
-                        "example": "link"
-                      }
-                    }
-                  },
-                  "text_options": {
-                    "type": "object",
-                    "description": "Options for text content generation",
-                    "properties": {
-                      "language": {
-                        "type": "string",
-                        "enum": [
-                          "English (US)",
-                          "English (UK)",
-                          "Spanish (Latin America)",
-                          "Spanish (Mexico)",
-                          "Spanish (Spain)",
-                          "French",
-                          "German",
-                          "Italian",
-                          "Portuguese (Brazil)",
-                          "Portuguese (Portugal)",
-                          "Dutch",
-                          "Polish",
-                          "Russian",
-                          "Japanese",
-                          "Korean",
-                          "Chinese (Simplified)",
-                          "Hindi",
-                          "Swedish",
-                          "Norwegian",
-                          "Danish",
-                          "Finnish",
-                          "Greek",
-                          "Turkish",
-                          "Czech",
-                          "Hungarian",
-                          "Romanian",
-                          "Bulgarian",
-                          "Ukrainian",
-                          "Vietnamese",
-                          "Thai",
-                          "Indonesian"
-                        ],
-                        "description": "Specifies the language for generated content and AI-generated elements.",
-                        "default": "English (US)",
-                        "example": "English (US)"
-                      },
-                      "tone": {
-                        "type": "string",
-                        "enum": ["DEFAULT", "PROFESSIONAL", "CASUAL", "TECHNICAL", "EDUCATIONAL", "INSPIRATIONAL", "NARRATIVE", "PERSUASIVE", "AUTHORITATIVE", "EMPATHETIC", "CUSTOM"],
-                        "description": "Defines the writing voice, style, and perspective applied to generated content.",
-                        "default": "PROFESSIONAL",
-                        "example": "PROFESSIONAL"
-                      },
-                      "tone_instructions": {
-                        "type": "string",
-                        "description": "Custom tone directives when no preset tone matches your needs. Set only when tone is CUSTOM."
-                      },
-                      "content_mode": {
-                        "type": "string",
-                        "enum": ["preserve", "enhance", "condense", "custom"],
-                        "description": "Controls how input text is processed and adapted for presentation format.",
-                        "default": "preserve",
-                        "example": "preserve"
-                      },
-                      "content_instructions": {
-                        "type": "string",
-                        "description": "Custom directives for text processing when no preset mode fits. Set only when content_mode is custom."
-                      },
-                      "amount_mode": {
-                        "type": "string",
-                        "enum": ["minimal", "essential", "balanced", "detailed", "custom"],
-                        "description": "Controls the density of text appearing on each slide.",
-                        "default": "essential",
-                        "example": "essential"
-                      },
-                      "amount_instructions": {
-                        "type": "string",
-                        "description": "Custom text density directives for specialized requirements. Set only when amount_mode is custom."
-                      }
-                    }
-                  },
-                  "image_options": {
-                    "type": "object",
-                    "description": "Options for AI-generated images",
-                    "properties": {
-                      "include_ai_images": {
-                        "type": "string",
-                        "enum": ["true", "false"],
-                        "description": "Whether to generate AI-powered illustrations alongside your content.",
-                        "default": "true",
-                        "example": "true"
-                      },
-                      "style": {
-                        "type": "string",
-                        "enum": ["auto", "realistic", "artistic", "cartoon", "three_d", "custom"],
-                        "description": "Controls the visual style of AI-generated images.",
-                        "default": "auto",
-                        "example": "auto"
-                      },
-                      "style_instructions": {
-                        "type": "string",
-                        "description": "Custom image generation directives for specialized visual requirements. Set only when style is custom."
-                      }
-                    }
-                  },
-                  "image_urls": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "description": "Array of image URLs to include in the presentation. These images will be used alongside or instead of AI-generated images.",
-                    "example": ["https://example.com/image1.png", "https://example.com/image2.jpg"]
-                  }
-                }
+                "$ref": "#/components/schemas/GeneratePresentationInput"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Presentation generated successfully",
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "presentation_url": {
-                      "type": "string",
-                      "format": "uri",
-                      "description": "Direct URL to view the generated presentation",
-                      "example": "https://app.getalai.com/presentation/<uuid>"
-                    },
-                    "presentation_id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "description": "Unique identifier for the presentation",
-                      "example": "<uuid>"
-                    }
-                  },
-                  "required": ["presentation_url", "presentation_id"]
+                  "$ref": "#/components/schemas/ExternalApiGenerationResponse"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized - Invalid or missing API key"
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/generations/{generation_id}": {
+      "get": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Check generation status",
+        "description": "Poll this endpoint to check the status of any async operation (presentation generation, slide creation, export, or transcript generation).\n\n**Status values:**\n- `pending` - Queued, not yet started\n- `in_progress` - Currently processing\n- `completed` - Finished successfully; results available in response\n- `failed` - Error occurred; check `error` field for details\n\n**Recommended polling:** Every 2-5 seconds. Most generations complete within 30-120 seconds.",
+        "operationId": "get_generation_status_api_v1_generations__generation_id__get",
+        "parameters": [
+          {
+            "name": "generation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Generation Id"
+            }
           },
-          "400": {
-            "description": "Bad Request - Invalid parameters"
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/PresentationGenerationStatus"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SlideCreationStatus"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExportStatus"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TranscriptStatus"
+                    }
+                  ],
+                  "title": "Response Get Generation Status Api V1 Generations  Generation Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/presentations/{presentation_id}/slides": {
+      "post": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Add a slide to an existing presentation",
+        "description": "Add a new slide to an existing presentation. This is an async operation\u2014poll the returned `generation_id` for completion.\n\nThe slide content will be transformed into a professionally designed slide with AI-generated layout and optional images.",
+        "operationId": "create_slide_api_v1_presentations__presentation_id__slides_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          },
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSlideContentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalApiGenerationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/presentations/{presentation_id}/slides/{slide_id}": {
+      "delete": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Delete a slide from a presentation",
+        "operationId": "delete_slide_api_v1_presentations__presentation_id__slides__slide_id__delete",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          },
+          {
+            "name": "slide_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Slide Id"
+            }
+          },
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSlideResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/presentations/{presentation_id}/exports": {
+      "post": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Export a presentation",
+        "description": "Export an existing presentation to one or more formats (PDF, PPTX). This is an async operation.\n\nPoll `GET /generations/{generation_id}` until status is `completed`, then access download URLs in the `formats` field.",
+        "operationId": "export_presentation_api_v1_presentations__presentation_id__exports_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          },
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportPresentationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalApiGenerationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/presentations/{presentation_id}/transcripts": {
+      "post": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Generate slide transcripts",
+        "description": "Extract slide content and layout information using AI. This is an async operation.\n\nReturns a structured description of each slide's text content and layout. You can process all slides or specify particular slide IDs.",
+        "operationId": "generate_transcripts_api_v1_presentations__presentation_id__transcripts_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          },
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateTranscriptInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalApiGenerationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/presentations/{presentation_id}": {
+      "delete": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "Delete Presentation",
+        "operationId": "delete_presentation_api_v1_presentations__presentation_id__delete",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          },
+          {
+            "name": "privacy_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Privacy Access Token"
+            }
+          },
+          {
+            "name": "admin_access_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Admin Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletePresentationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "API key passed as Bearer token"
+    "schemas": {
+      "AIImageStyleType": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "realistic",
+          "artistic",
+          "cartoon",
+          "three_d",
+          "custom"
+        ],
+        "title": "AIImageStyleType"
+      },
+      "ApiExportFormat": {
+        "type": "string",
+        "enum": [
+          "link",
+          "pdf",
+          "ppt"
+        ],
+        "title": "ApiExportFormat"
+      },
+      "ApiGenerationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "completed",
+          "failed"
+        ],
+        "title": "ApiGenerationStatus"
+      },
+      "ApiThemeId": {
+        "type": "string",
+        "enum": [
+          "NEBULA_DARK",
+          "AMETHYST_LIGHT",
+          "FLAT_WHITE",
+          "DESERT_BLOOM",
+          "LAPIS_DAWN",
+          "EMERALD_FOREST",
+          "COSMIC_THREAD",
+          "DONUT",
+          "OAK",
+          "OBSIDIAN_FLOW",
+          "MIDNIGHT_EMBER",
+          "AURORA_FLUX"
+        ],
+        "title": "ApiThemeId"
+      },
+      "Body_upload_images_api_v1_upload_images_post": {
+        "properties": {
+          "files": {
+            "items": {
+              "type": "string",
+              "format": "binary"
+            },
+            "type": "array",
+            "title": "Files"
+          }
+        },
+        "type": "object",
+        "required": [
+          "files"
+        ],
+        "title": "Body_upload_images_api_v1_upload_images_post"
+      },
+      "CreateSlideContentInput": {
+        "properties": {
+          "slide_context": {
+            "type": "string",
+            "title": "Slide Context",
+            "description": "Content for this slide."
+          },
+          "options": {
+            "$ref": "#/components/schemas/CreateSlideOptions"
+          },
+          "export_formats": {
+            "items": {
+              "$ref": "#/components/schemas/ApiExportFormat"
+            },
+            "type": "array",
+            "title": "Export Formats",
+            "description": "The formats in which the generation will make the slide available",
+            "default": [
+              "link"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "slide_context"
+        ],
+        "title": "CreateSlideContentInput"
+      },
+      "CreateSlideOptions": {
+        "properties": {
+          "additional_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Instructions",
+            "description": "Guidance for the AI on this specific slide's style or content focus."
+          },
+          "slide_order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slide Order",
+            "description": "Position in the presentation (0-indexed). If omitted, appends to the end."
+          },
+          "total_variants_per_slide": {
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Total Variants Per Slide",
+            "description": "Number of distinct options to generate for each slide",
+            "default": 1
+          },
+          "num_image_variants": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Num Image Variants",
+            "description": "Number of image slide variants generated using Nano Banana Pro. Increases cost.",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "CreateSlideOptions"
+      },
+      "DeletePresentationResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "presentation_id": {
+            "type": "string",
+            "title": "Presentation Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "presentation_id"
+        ],
+        "title": "DeletePresentationResponse"
+      },
+      "DeleteSlideResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "DeleteSlideResponse"
+      },
+      "ExportPresentationInput": {
+        "properties": {
+          "formats": {
+            "items": {
+              "$ref": "#/components/schemas/ApiExportFormat"
+            },
+            "type": "array",
+            "title": "Formats",
+            "description": "Formats to export: 'link' (shareable URL), 'pdf', 'ppt'",
+            "default": [
+              "link"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "ExportPresentationInput"
+      },
+      "ExportStatus": {
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiGenerationStatus"
+              }
+            ],
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Human-readable error message when status is 'failed'"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "ISO 8601 timestamp when generation finished"
+          },
+          "generation_type": {
+            "type": "string",
+            "enum": [
+              "presentation_export"
+            ],
+            "const": "presentation_export",
+            "title": "Generation Type",
+            "default": "presentation_export"
+          },
+          "presentation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation Id"
+          },
+          "formats": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/FormatResult"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formats",
+            "description": "Export results keyed by format ('link', 'pdf', 'ppt')"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generation_id",
+          "status",
+          "created_at"
+        ],
+        "title": "ExportStatus"
+      },
+      "ExternalApiGenerationResponse": {
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id",
+            "description": "Unique identifier to poll for generation status via GET /generations/{generation_id}"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generation_id"
+        ],
+        "title": "ExternalApiGenerationResponse"
+      },
+      "FormatResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Export status: 'completed', 'failed', or 'skipped'"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url",
+            "description": "Signed URL to download the exported file. Valid for 24 hours."
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Error message if export failed for this format"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "FormatResult"
+      },
+      "GeneratePresentationInput": {
+        "properties": {
+          "input_text": {
+            "type": "string",
+            "title": "Input Text",
+            "description": "Content to transform into slides. Can be plain text, markdown, or structured notes. Longer input typically produces more slides."
+          },
+          "additional_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Instructions",
+            "description": "Guidance for the AI on style, focus areas, or specific requirements not captured in other options."
+          },
+          "image_urls": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Urls",
+            "description": "URLs of images to incorporate. Images are matched to relevant slides automatically."
+          },
+          "export_formats": {
+            "items": {
+              "$ref": "#/components/schemas/ApiExportFormat"
+            },
+            "type": "array",
+            "title": "Export Formats",
+            "description": "Formats to export upon completion. 'link' is a shareable web URL. 'pdf' and 'ppt' provide downloadable files.",
+            "default": [
+              "link"
+            ]
+          },
+          "presentation_options": {
+            "$ref": "#/components/schemas/PresentationOptions"
+          },
+          "text_options": {
+            "$ref": "#/components/schemas/TextOptions"
+          },
+          "image_options": {
+            "$ref": "#/components/schemas/ImageOptions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_text"
+        ],
+        "title": "GeneratePresentationInput"
+      },
+      "GenerateTranscriptInput": {
+        "properties": {
+          "slide_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slide Ids",
+            "description": "Specific slides to generate transcripts for. If omitted, generates for all slides."
+          }
+        },
+        "type": "object",
+        "title": "GenerateTranscriptInput"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ImageOptions": {
+        "properties": {
+          "include_ai_images": {
+            "type": "boolean",
+            "title": "Include Ai Images",
+            "description": "Generate AI images for slides. Disable to use only uploaded images or no images.",
+            "default": true
+          },
+          "style": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AIImageStyleType"
+              }
+            ],
+            "description": "AI image style: 'auto' (content-aware), 'realistic', 'artistic', 'cartoon', 'three_d', or 'custom'.",
+            "default": "auto"
+          },
+          "style_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style Instructions",
+            "description": "Required when style='custom'. Describe the desired image aesthetic."
+          },
+          "num_image_variants": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Num Image Variants",
+            "description": "Number of image slide variants generated using Nano Banana Pro. Increases cost.",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "ImageOptions"
+      },
+      "LanguageType": {
+        "type": "string",
+        "enum": [
+          "English (US)",
+          "English (UK)",
+          "Spanish (Latin America)",
+          "Spanish (Mexico)",
+          "Spanish (Spain)",
+          "French",
+          "German",
+          "Italian",
+          "Portuguese (Brazil)",
+          "Portuguese (Portugal)",
+          "Dutch",
+          "Polish",
+          "Russian",
+          "Japanese",
+          "Korean",
+          "Chinese (Simplified)",
+          "Hindi",
+          "Swedish",
+          "Norwegian",
+          "Danish",
+          "Finnish",
+          "Greek",
+          "Turkish",
+          "Czech",
+          "Hungarian",
+          "Romanian",
+          "Bulgarian",
+          "Ukrainian",
+          "Vietnamese",
+          "Thai",
+          "Indonesian"
+        ],
+        "title": "LanguageType"
+      },
+      "PresentationGenerationStatus": {
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiGenerationStatus"
+              }
+            ],
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Human-readable error message when status is 'failed'"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "ISO 8601 timestamp when generation finished"
+          },
+          "generation_type": {
+            "type": "string",
+            "enum": [
+              "presentation_generation"
+            ],
+            "const": "presentation_generation",
+            "title": "Generation Type",
+            "default": "presentation_generation"
+          },
+          "presentation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation Id",
+            "description": "Available once generation starts. Use this ID for subsequent operations."
+          },
+          "formats": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/FormatResult"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formats",
+            "description": "Export results keyed by format ('link', 'pdf', 'ppt'). Only present when completed."
+          }
+        },
+        "type": "object",
+        "required": [
+          "generation_id",
+          "status",
+          "created_at"
+        ],
+        "title": "PresentationGenerationStatus"
+      },
+      "PresentationOptions": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Presentation title shown on the title slide and in exports",
+            "default": "API Generated Presentation"
+          },
+          "theme_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiThemeId"
+              }
+            ],
+            "description": "Visual theme controlling colors, fonts, and styling",
+            "default": "AMETHYST_LIGHT"
+          },
+          "slide_range": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SlideRange"
+              }
+            ],
+            "description": "Target slide count. 'auto' analyzes input length. '1' generates a single slide. Ranges like '2-5' set bounds.",
+            "default": "auto"
+          },
+          "existing_presentation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Existing Presentation Id",
+            "description": "Append slides to an existing presentation instead of creating a new one"
+          },
+          "total_variants_per_slide": {
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Total Variants Per Slide",
+            "description": "Number of distinct options to generate for each slide",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "PresentationOptions"
+      },
+      "SlideCreationStatus": {
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiGenerationStatus"
+              }
+            ],
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Human-readable error message when status is 'failed'"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "ISO 8601 timestamp when generation finished"
+          },
+          "generation_type": {
+            "type": "string",
+            "enum": [
+              "slide_creation"
+            ],
+            "const": "slide_creation",
+            "title": "Generation Type",
+            "default": "slide_creation"
+          },
+          "presentation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation Id"
+          },
+          "slide_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slide Id",
+            "description": "ID of the newly created slide. Available when completed."
+          },
+          "formats": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/FormatResult"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formats",
+            "description": "Export results if export_formats were requested"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generation_id",
+          "status",
+          "created_at"
+        ],
+        "title": "SlideCreationStatus"
+      },
+      "SlideRange": {
+        "type": "string",
+        "enum": [
+          "1",
+          "auto",
+          "2-5",
+          "6-10",
+          "11-15",
+          "16-20",
+          "21-25",
+          "26-50"
+        ],
+        "title": "SlideRange"
+      },
+      "SlideTranscript": {
+        "properties": {
+          "slide_id": {
+            "type": "string",
+            "title": "Slide Id"
+          },
+          "slide_order": {
+            "type": "integer",
+            "title": "Slide Order",
+            "description": "Position in the presentation (0-indexed)"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Slide heading, if present"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "Generated speaker notes for this slide"
+          },
+          "layout": {
+            "type": "string",
+            "title": "Layout",
+            "description": "Layout type used for this slide"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slide_id",
+          "slide_order",
+          "content",
+          "layout"
+        ],
+        "title": "SlideTranscript"
+      },
+      "TextAmountMode": {
+        "type": "string",
+        "enum": [
+          "minimal",
+          "essential",
+          "balanced",
+          "detailed",
+          "custom"
+        ],
+        "title": "TextAmountMode"
+      },
+      "TextContentMode": {
+        "type": "string",
+        "enum": [
+          "enhance",
+          "condense",
+          "preserve",
+          "custom"
+        ],
+        "title": "TextContentMode"
+      },
+      "TextOptions": {
+        "properties": {
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LanguageType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Output language. If not set, matches the input language."
+          },
+          "tone": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ToneType"
+              }
+            ],
+            "description": "Writing style: professional, casual, technical, educational, etc. Use 'custom' with tone_instructions for specific guidance.",
+            "default": "DEFAULT"
+          },
+          "tone_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tone Instructions",
+            "description": "Required when tone='custom'. Describe the desired voice and style."
+          },
+          "content_mode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextContentMode"
+              }
+            ],
+            "description": "How to handle input content. 'preserve': use as-is. 'condense': shorten. 'enhance': expand with context. 'custom': follow content_instructions.",
+            "default": "preserve"
+          },
+          "content_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Instructions",
+            "description": "Required when content_mode='custom'. Describe how to transform the content."
+          },
+          "amount_mode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextAmountMode"
+              }
+            ],
+            "description": "Text density per slide. 'minimal': keywords only. 'essential': key points. 'balanced': with context. 'detailed': comprehensive.",
+            "default": "essential"
+          },
+          "amount_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Instructions",
+            "description": "Required when amount_mode='custom'. Describe the desired text density."
+          }
+        },
+        "type": "object",
+        "title": "TextOptions"
+      },
+      "ToneType": {
+        "type": "string",
+        "enum": [
+          "DEFAULT",
+          "PROFESSIONAL",
+          "CASUAL",
+          "TECHNICAL",
+          "EDUCATIONAL",
+          "INSPIRATIONAL",
+          "NARRATIVE",
+          "PERSUASIVE",
+          "AUTHORITATIVE",
+          "EMPATHETIC",
+          "CUSTOM"
+        ],
+        "title": "ToneType"
+      },
+      "TranscriptStatus": {
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "title": "Generation Id"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiGenerationStatus"
+              }
+            ],
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Human-readable error message when status is 'failed'"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "ISO 8601 timestamp when generation finished"
+          },
+          "generation_type": {
+            "type": "string",
+            "enum": [
+              "transcript_generation"
+            ],
+            "const": "transcript_generation",
+            "title": "Generation Type",
+            "default": "transcript_generation"
+          },
+          "presentation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presentation Id"
+          },
+          "transcripts": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SlideTranscript"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcripts",
+            "description": "Speaker notes for each slide, ordered by slide_order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generation_id",
+          "status",
+          "created_at"
+        ],
+        "title": "TranscriptStatus"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
-  }
+  },
+  "servers": [
+    {
+      "url": "https://slides-api.getalai.com"
+    }
+  ]
 }

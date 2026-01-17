@@ -1,0 +1,109 @@
+---
+title: "Check Generation Status"
+openapi: "GET /api/v1/generations/{generation_id}"
+---
+
+Poll this endpoint to check the status of any async operation (presentation generation, slide creation, export, or transcript generation).
+
+## Status Values
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Queued, not yet started |
+| `in_progress` | Currently processing |
+| `completed` | Finished successfully; results available |
+| `failed` | Error occurred; check `error` field |
+
+**Recommended polling:** Every 2-5 seconds. Most operations complete within 30-120 seconds.
+
+---
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `generation_id` | string | The generation ID you're polling |
+| `status` | string | Current status |
+| `error` | string | Error message (when `failed`) |
+| `created_at` | string | ISO 8601 timestamp |
+| `completed_at` | string | When generation finished |
+| `presentation_id` | string | ID of the presentation |
+| `formats` | object | Export results (when `completed`) |
+
+---
+
+## Format Results
+
+When status is `completed`, the `formats` object contains results for each requested format:
+
+```json
+{
+  "generation_id": "abc123-...",
+  "status": "completed",
+  "presentation_id": "xyz789-...",
+  "formats": {
+    "link": {
+      "status": "completed",
+      "url": "https://app.getalai.com/view/..."
+    },
+    "pdf": {
+      "status": "completed",
+      "url": "https://storage.../presentation.pdf"
+    },
+    "ppt": {
+      "status": "completed",
+      "url": "https://storage.../presentation.pptx"
+    }
+  }
+}
+```
+
+Each format has:
+- `status`: `completed`, `failed`, or `skipped`
+- `url`: Signed download URL (valid for 24 hours)
+- `error`: Error message if failed
+
+---
+
+## Example
+
+```bash
+curl "https://slides-api.getalai.com/api/v1/generations/abc123-def456-..." \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+---
+
+## Polling Example (Python)
+
+```python
+import time
+import requests
+
+def wait_for_generation(generation_id, api_key, max_wait=300):
+    url = f"https://slides-api.getalai.com/api/v1/generations/{generation_id}"
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    start = time.time()
+    while time.time() - start < max_wait:
+        response = requests.get(url, headers=headers)
+        data = response.json()
+
+        if data["status"] == "completed":
+            return data
+        elif data["status"] == "failed":
+            raise Exception(data.get("error", "Generation failed"))
+
+        time.sleep(3)  # Poll every 3 seconds
+
+    raise TimeoutError("Generation timed out")
+
+# Usage
+result = wait_for_generation("abc123-...", "YOUR_API_KEY")
+print(result["formats"]["link"]["url"])
+```
+
+<Tip>
+  Download URLs in the `formats` object are signed and valid for 24 hours.
+  Store the `presentation_id` if you need to export again later.
+</Tip>

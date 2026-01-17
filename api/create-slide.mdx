@@ -1,0 +1,75 @@
+---
+title: "Create Slide"
+openapi: "POST /api/v1/presentations/{presentation_id}/slides"
+---
+
+Add a slide to an existing presentation. This is an **async operation** - poll the returned `generation_id` for completion.
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `presentation_id` | string | ID of the presentation to add the slide to |
+
+---
+
+## Request Body
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `slide_context` | string | (required) | Content for this slide |
+| `options.additional_instructions` | string | - | Extra instructions for slide generation |
+| `options.slide_order` | integer | (end) | Position in presentation (0-indexed) |
+| `options.total_variants_per_slide` | integer | 1 | Variants to generate (1-4) |
+| `options.num_image_variants` | integer | 0 | Image slide variants (0-2) |
+| `export_formats` | array | `["link"]` | Formats to export: `link`, `pdf`, `ppt` |
+
+---
+
+## Response
+
+```json
+{
+  "generation_id": "abc123-def456-..."
+}
+```
+
+Poll `GET /generations/{generation_id}` until status is `completed`. The response will include `slide_id`.
+
+---
+
+## Example
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../slides" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "slide_context": "Key achievements: 25% revenue growth, 50 new clients",
+    "options": {
+      "additional_instructions": "Make it visual with icons"
+    }
+  }'
+```
+
+---
+
+## Status Response
+
+When polling, the status response includes `slide_id`:
+
+```json
+{
+  "generation_id": "abc123-...",
+  "generation_type": "slide_creation",
+  "status": "completed",
+  "presentation_id": "xyz789-...",
+  "slide_id": "slide123-...",
+  "formats": {
+    "link": {
+      "status": "completed",
+      "url": "https://app.getalai.com/view/..."
+    }
+  }
+}
+```
