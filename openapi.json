@@ -34,40 +34,6 @@
         "summary": "Upload images for use in presentations",
         "description": "Upload images to be used in presentation generation. Returns image IDs that can be referenced in subsequent requests.\n\n**Limits:** Max 10 images per request, 5MB per file. Supported formats: PNG, JPEG, WebP, GIF, AVIF, SVG.",
         "operationId": "upload_images_api_v1_upload_images_post",
-        "parameters": [
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -108,40 +74,6 @@
         "summary": "Generate a presentation",
         "description": "Create a new presentation from text content. This is an async operation.\n\n**Workflow:**\n1. Submit your content and options\n2. Receive a `generation_id` immediately\n3. Poll `GET /generations/{generation_id}` until status is `completed` or `failed`\n4. Access your presentation via the URLs in the response\n\n**Rate limit:** Max 5 concurrent generations per user.",
         "operationId": "generate_presentation_api_v1_generations_post",
-        "parameters": [
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -192,38 +124,6 @@
             "schema": {
               "type": "string",
               "title": "Generation Id"
-            }
-          },
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
             }
           }
         ],
@@ -281,38 +181,6 @@
             "schema": {
               "type": "string",
               "title": "Presentation Id"
-            }
-          },
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
             }
           }
         ],
@@ -375,38 +243,6 @@
               "type": "string",
               "title": "Slide Id"
             }
-          },
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
-            }
           }
         ],
         "responses": {
@@ -449,38 +285,6 @@
             "schema": {
               "type": "string",
               "title": "Presentation Id"
-            }
-          },
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
             }
           }
         ],
@@ -535,38 +339,6 @@
               "type": "string",
               "title": "Presentation Id"
             }
-          },
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
-            }
           }
         ],
         "requestBody": {
@@ -618,38 +390,6 @@
             "schema": {
               "type": "string",
               "title": "Presentation Id"
-            }
-          },
-          {
-            "name": "privacy_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Privacy Access Token"
-            }
-          },
-          {
-            "name": "admin_access_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Admin Access Token"
             }
           }
         ],
