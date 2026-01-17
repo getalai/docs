@@ -24,8 +24,8 @@ The **Alai API** brings this power to your applications. Generate presentations 
   <Card title="Export Anywhere" icon="download">
     Get shareable links, PDFs, or PowerPoint files
   </Card>
-  <Card title="Speaker Notes" icon="microphone">
-    Auto-generate transcripts and talking points for each slide
+  <Card title="Extract Content" icon="file-lines">
+    Get structured content and layout information from slides
   </Card>
 </CardGroup>
 
@@ -192,7 +192,7 @@ These endpoints return a `generation_id`. Poll `GET /generations/{id}` until com
 | `/generations` | POST | Generate a presentation from text |
 | `/presentations/{id}/slides` | POST | Add a slide to a presentation |
 | `/presentations/{id}/exports` | POST | Export to PDF, PPT, or shareable link |
-| `/presentations/{id}/transcripts` | POST | Generate speaker notes |
+| `/presentations/{id}/transcripts` | POST | Extract slide content and layout |
 
 ### Synchronous Operations
 These endpoints return results immediately.

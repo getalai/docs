@@ -1,9 +1,9 @@
 ---
-title: "Generate Transcripts"
+title: "Extract Transcripts"
 openapi: "POST /api/v1/presentations/{presentation_id}/transcripts"
 ---
 
-Generate speaker notes/transcripts for slides using AI. This is an **async operation**.
+Extract structured content and layout information from slides. This is an **async operation**.
 
 ## Path Parameters
 
@@ -17,7 +17,7 @@ Generate speaker notes/transcripts for slides using AI. This is an **async opera
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `slide_ids` | array | (all slides) | Specific slide IDs to generate transcripts for. If omitted, generates for all slides. |
+| `slide_ids` | array | (all slides) | Specific slide IDs to extract transcripts for. If omitted, extracts for all slides. |
 
 ---
 
@@ -69,15 +69,15 @@ curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../tra
     {
       "slide_id": "slide1-...",
       "slide_order": 0,
-      "title": "Introduction",
-      "content": "Welcome everyone. Today we'll be discussing...",
+      "title": "Q4 Sales Report",
+      "content": "Quarterly Performance Overview\n\nRevenue: $1.2M\nGrowth: +25% YoY",
       "layout": "TITLE_SLIDE"
     },
     {
       "slide_id": "slide2-...",
       "slide_order": 1,
       "title": "Key Metrics",
-      "content": "Let's look at our performance this quarter...",
+      "content": "• New customers: 150\n• Retention rate: 94%\n• NPS score: 72",
       "layout": "CONTENT_SLIDE"
     }
   ]
