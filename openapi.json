@@ -375,6 +375,28 @@
         }
       }
     },
+    "/api/v1/presentations": {
+      "get": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "List all presentations",
+        "description": "Retrieve a list of all presentations belonging to the authenticated user. Returns presentations sorted by creation date (newest first).",
+        "operationId": "get_presentations_api_v1_presentations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationsListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/presentations/{presentation_id}": {
       "delete": {
         "tags": [
@@ -918,6 +940,85 @@
           "Indonesian"
         ],
         "title": "LanguageType"
+      },
+      "PresentationSummary": {
+        "properties": {
+          "presentation_id": {
+            "type": "string",
+            "title": "Presentation Id",
+            "description": "Unique identifier for the presentation"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Title of the presentation"
+          },
+          "slide_count": {
+            "type": "integer",
+            "title": "Slide Count",
+            "description": "Number of slides in the presentation"
+          },
+          "theme_id": {
+            "type": "string",
+            "title": "Theme Id",
+            "description": "Visual theme applied to the presentation"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At",
+            "description": "ISO 8601 timestamp when the presentation was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At",
+            "description": "ISO 8601 timestamp when the presentation was last modified"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url",
+            "description": "URL to the presentation thumbnail image"
+          }
+        },
+        "type": "object",
+        "required": [
+          "presentation_id",
+          "title",
+          "slide_count",
+          "theme_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PresentationSummary"
+      },
+      "PresentationsListResponse": {
+        "properties": {
+          "presentations": {
+            "items": {
+              "$ref": "#/components/schemas/PresentationSummary"
+            },
+            "type": "array",
+            "title": "Presentations",
+            "description": "List of presentations"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of presentations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "presentations",
+          "total"
+        ],
+        "title": "PresentationsListResponse"
       },
       "PresentationGenerationStatus": {
         "properties": {

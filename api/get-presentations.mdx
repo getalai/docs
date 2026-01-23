@@ -1,0 +1,72 @@
+---
+title: "Get Presentations"
+openapi: "GET /api/v1/presentations"
+---
+
+Retrieve a list of all presentations belonging to the authenticated user. Returns presentations sorted by creation date (newest first).
+
+---
+
+## Response
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `presentations` | array | List of presentation summaries |
+| `total` | integer | Total number of presentations |
+
+### Presentation Summary
+
+Each presentation in the array contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `presentation_id` | string | Unique identifier for the presentation |
+| `title` | string | Title of the presentation |
+| `slide_count` | integer | Number of slides in the presentation |
+| `theme_id` | string | Visual theme applied to the presentation |
+| `created_at` | string | ISO 8601 timestamp when created |
+| `updated_at` | string | ISO 8601 timestamp when last modified |
+| `thumbnail_url` | string | URL to the presentation thumbnail (may be null) |
+
+---
+
+## Example Response
+
+```json
+{
+  "presentations": [
+    {
+      "presentation_id": "abc123-def456-789",
+      "title": "Q4 Sales Report",
+      "slide_count": 8,
+      "theme_id": "NEBULA_DARK",
+      "created_at": "2025-01-15T10:30:00Z",
+      "updated_at": "2025-01-15T14:22:00Z",
+      "thumbnail_url": "https://..."
+    },
+    {
+      "presentation_id": "xyz789-abc123-456",
+      "title": "Product Roadmap 2025",
+      "slide_count": 12,
+      "theme_id": "AMETHYST_LIGHT",
+      "created_at": "2025-01-10T09:00:00Z",
+      "updated_at": "2025-01-12T16:45:00Z",
+      "thumbnail_url": "https://..."
+    }
+  ],
+  "total": 2
+}
+```
+
+---
+
+## Example Request
+
+```bash
+curl -X GET "https://slides-api.getalai.com/api/v1/presentations" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+<Tip>
+  Use the `presentation_id` from this response to perform operations like adding slides, exporting, or deleting presentations.
+</Tip>

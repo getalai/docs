@@ -19,6 +19,7 @@
           {
             "group": "Presentations",
             "pages": [
+              "api/get-presentations",
               "api/generations",
               "api/generation-status",
               "api/export-presentation",
