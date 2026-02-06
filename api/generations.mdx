@@ -33,7 +33,7 @@ Generate a presentation from text content. This is an **async operation** - you 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `presentation_options.title` | string | "API Generated Presentation" | Title shown on title slide and in exports |
-| `presentation_options.theme_id` | string | "AMETHYST_LIGHT" | Visual theme (see available themes) |
+| `presentation_options.theme_id` | string | "Simple Light" | Visual theme (see available themes) |
 | `presentation_options.slide_range` | string | "auto" | Target slide count: `auto`, `1`, `2-5`, `6-10`, `11-15`, `16-20`, `21-25`, `26-50` |
 | `presentation_options.existing_presentation_id` | string | - | Append slides to existing presentation |
 | `presentation_options.total_variants_per_slide` | integer | 1 | Variants per slide (1-4) |
@@ -95,7 +95,7 @@ curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
     "export_formats": ["link", "pdf", "ppt"],
     "presentation_options": {
       "title": "Q4 Sales Report",
-      "theme_id": "NEBULA_DARK",
+      "theme_id": "Simple Dark",
       "slide_range": "6-10"
     },
     "text_options": {

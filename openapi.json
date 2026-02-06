@@ -476,18 +476,29 @@
       "ApiThemeId": {
         "type": "string",
         "enum": [
-          "NEBULA_DARK",
-          "AMETHYST_LIGHT",
-          "FLAT_WHITE",
-          "DESERT_BLOOM",
-          "LAPIS_DAWN",
-          "EMERALD_FOREST",
-          "COSMIC_THREAD",
-          "DONUT",
-          "OAK",
-          "OBSIDIAN_FLOW",
-          "MIDNIGHT_EMBER",
-          "AURORA_FLUX"
+          "Simple Light",
+          "Simple Dark",
+          "Simple Light (with color)",
+          "Simple Light (Serif)",
+          "Simple Dark (Serif)",
+          "Fairytale",
+          "Techy Grey",
+          "Classic Maroon",
+          "Royal Blue",
+          "Retro blue",
+          "Dark Cool Serif",
+          "Light Cool Creative",
+          "Dark Serif Warm",
+          "Dark Creative Warm",
+          "Red & Paper",
+          "Donut",
+          "Cyberpunk",
+          "Aurora Flux",
+          "Oak",
+          "Emerald Forest",
+          "Midnight Ember",
+          "Prismatica",
+          "Desert Bloom"
         ],
         "title": "ApiThemeId"
       },
@@ -1122,7 +1133,7 @@
               }
             ],
             "description": "Visual theme controlling colors, fonts, and styling",
-            "default": "AMETHYST_LIGHT"
+            "default": "Simple Light"
           },
           "slide_range": {
             "allOf": [

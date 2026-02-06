@@ -44,7 +44,7 @@ class AlaiClient:
         content: str,
         title: str = "Presentation",
         slide_range: str = "auto",
-        theme: str = "AMETHYST_LIGHT",
+        theme: str = "Simple Light",
         export_formats: List[str] = None,
         wait: bool = True,
         timeout: int = 300
@@ -266,7 +266,7 @@ result = client.generate_presentation(
     """,
     title="Introduction to Machine Learning",
     slide_range="6-10",
-    theme="NEBULA_DARK",
+    theme="Simple Dark",
     export_formats=["link", "pdf"]
 )
 
@@ -321,7 +321,7 @@ def generate_weekly_report(metrics: dict) -> dict:
         content=content,
         title=f"Weekly Report - W{week_num}",
         slide_range="6-10",
-        theme="LAPIS_DAWN",
+        theme="Royal Blue",
         export_formats=["link", "pdf", "ppt"]
     )
 
@@ -635,6 +635,6 @@ except Exception as e:
     Detailed documentation for all endpoints and parameters
   </Card>
   <Card title="Available Themes" icon="palette" href="/api/introduction#available-themes">
-    Browse all 12 professionally designed themes
+    Browse all 23 professionally designed themes
   </Card>
 </CardGroup>
