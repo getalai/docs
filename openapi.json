@@ -798,7 +798,7 @@
             "title": "Additional Instructions",
             "description": "Guidance for the AI on style, focus areas, or specific requirements not captured in other options."
           },
-          "image_urls": {
+          "image_ids": {
             "anyOf": [
               {
                 "items": {
@@ -810,8 +810,8 @@
                 "type": "null"
               }
             ],
-            "title": "Image Urls",
-            "description": "URLs of images to incorporate. Images are matched to relevant slides automatically."
+            "title": "Image Ids",
+            "description": "IDs of previously uploaded images (from POST /upload-images) to incorporate. Images are matched to relevant slides automatically."
           },
           "export_formats": {
             "items": {

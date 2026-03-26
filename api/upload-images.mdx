@@ -3,11 +3,11 @@ title: "Upload Images"
 openapi: "POST /api/v1/upload-images"
 ---
 
-Upload images for use in presentation generation. This is a synchronous operation that returns image IDs immediately. These IDs can be referenced via `image_urls` in subsequent requests.
+Upload images for use in presentation generation. This is a synchronous operation that returns image IDs (UUIDs) immediately. These can be passed via `image_ids` in subsequent generation requests.
 
 ## Limits
 
-- **Max file size:** 5MB per image
+- **Max file size:** 10MB per image
 - **Max images:** 10 per request
 - **Supported formats:** PNG, JPEG, WebP, GIF, AVIF, SVG
 

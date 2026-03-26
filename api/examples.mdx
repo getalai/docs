@@ -46,6 +46,7 @@ class AlaiClient:
         slide_range: str = "auto",
         theme: str = "Simple Light",
         export_formats: List[str] = None,
+        image_ids: List[str] = None,
         wait: bool = True,
         timeout: int = 300
     ) -> dict:
@@ -58,6 +59,7 @@ class AlaiClient:
             slide_range: Number of slides ("auto", "1", "2-5", "6-10", etc.)
             theme: Visual theme ID
             export_formats: List of formats ["link", "pdf", "ppt"]
+            image_ids: List of image IDs from upload_images()
             wait: If True, polls until completion
             timeout: Max seconds to wait
 
@@ -67,18 +69,22 @@ class AlaiClient:
         if export_formats is None:
             export_formats = ["link"]
 
+        payload = {
+            "input_text": content,
+            "presentation_options": {
+                "title": title,
+                "slide_range": slide_range,
+                "theme_id": theme
+            },
+            "export_formats": export_formats
+        }
+        if image_ids:
+            payload["image_ids"] = image_ids
+
         response = requests.post(
             f"{self.base_url}/generations",
             headers=self.headers,
-            json={
-                "input_text": content,
-                "presentation_options": {
-                    "title": title,
-                    "slide_range": slide_range,
-                    "theme_id": theme
-                },
-                "export_formats": export_formats
-            }
+            json=payload
         )
         response.raise_for_status()
         result = response.json()
@@ -519,10 +525,9 @@ image_ids = client.upload_images([
     "team_photo.jpg",
     "office_building.png"
 ])
-print(f"Uploaded {len(image_ids)} images")
+print(f"Uploaded {len(image_ids)} images: {image_ids}")
 
-# Generate presentation referencing uploaded images
-# Note: The API will intelligently incorporate your images
+# Generate presentation referencing uploaded images via their IDs
 result = client.generate_presentation(
     content="""
     About Our Company
@@ -540,14 +545,15 @@ result = client.generate_presentation(
     fosters creativity and collaboration.
     """,
     title="About Our Company",
-    slide_range="6-10"
+    slide_range="6-10",
+    image_ids=image_ids
 )
 
 print(f"Presentation: {result['formats']['link']['url']}")
 ```
 
 <Tip>
-  Supported image formats: PNG, JPEG, WebP, GIF, AVIF, SVG. Max 5MB per file, 10 images per upload.
+  Supported image formats: PNG, JPEG, WebP, GIF, AVIF, SVG. Max 10MB per file, 10 images per upload.
 </Tip>
 
 ---
