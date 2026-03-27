@@ -26,23 +26,87 @@
         }
       }
     },
+    "/api/v1/presentations": {
+      "get": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "List all presentations",
+        "description": "Returns a list of all presentations owned by the authenticated user, including their IDs and titles.",
+        "operationId": "get_presentations_api_v1_presentations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPresentationsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes": {
+      "get": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "List available themes",
+        "description": "Returns theme IDs and names for all system themes and user themes accessible to the authenticated user.",
+        "operationId": "get_themes_api_v1_themes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetThemesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/upload-images": {
       "post": {
         "tags": [
           "External API"
         ],
         "summary": "Upload images for use in presentations",
-        "description": "Upload images to be used in presentation generation. Returns image IDs that can be referenced in subsequent requests.\n\n**Limits:** Max 10 images per request, 5MB per file. Supported formats: PNG, JPEG, WebP, GIF, AVIF, SVG.",
+        "description": "Upload images to be used in presentation generation. Returns image IDs that can be referenced in subsequent requests.\n\n**Limits:** Max 10 images per request, 10MB per file. Supported formats: PNG, JPEG, WebP, GIF, AVIF, SVG.",
         "operationId": "upload_images_api_v1_upload_images_post",
         "requestBody": {
-          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/Body_upload_images_api_v1_upload_images_post"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -75,14 +139,14 @@
         "description": "Create a new presentation from text content. This is an async operation.\n\n**Workflow:**\n1. Submit your content and options\n2. Receive a `generation_id` immediately\n3. Poll `GET /generations/{generation_id}` until status is `completed` or `failed`\n4. Access your presentation via the URLs in the response\n\n**Rate limit:** Max 5 concurrent generations per user.",
         "operationId": "generate_presentation_api_v1_generations_post",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/GeneratePresentationInput"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -114,7 +178,7 @@
           "External API"
         ],
         "summary": "Check generation status",
-        "description": "Poll this endpoint to check the status of any async operation (presentation generation, slide creation, export, or transcript generation).\n\n**Status values:**\n- `pending` - Queued, not yet started\n- `in_progress` - Currently processing\n- `completed` - Finished successfully; results available in response\n- `failed` - Error occurred; check `error` field for details\n\n**Recommended polling:** Every 5 seconds. Most generations complete within 1-3 minutes depending on slide count.",
+        "description": "Poll this endpoint to check the status of any async operation (presentation generation, slide creation, export, or transcript generation).\n\n**Status values:**\n- `pending` - Queued, not yet started\n- `in_progress` - Currently processing\n- `completed` - Finished successfully; results available in response\n- `failed` - Error occurred; check `error` field for details\n\n**Recommended polling:** Every 2-5 seconds. Most generations complete within 30-120 seconds.",
         "operationId": "get_generation_status_api_v1_generations__generation_id__get",
         "parameters": [
           {
@@ -375,28 +439,6 @@
         }
       }
     },
-    "/api/v1/presentations": {
-      "get": {
-        "tags": [
-          "External API"
-        ],
-        "summary": "List all presentations",
-        "description": "Retrieve a list of all presentations belonging to the authenticated user. Returns presentations sorted by creation date (newest first).",
-        "operationId": "get_presentations_api_v1_presentations_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PresentationsListResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/presentations/{presentation_id}": {
       "delete": {
         "tags": [
@@ -472,35 +514,6 @@
           "failed"
         ],
         "title": "ApiGenerationStatus"
-      },
-      "ApiThemeId": {
-        "type": "string",
-        "enum": [
-          "Simple Light",
-          "Simple Dark",
-          "Simple Light (with color)",
-          "Simple Light (Serif)",
-          "Simple Dark (Serif)",
-          "Fairytale",
-          "Techy Grey",
-          "Classic Maroon",
-          "Royal Blue",
-          "Retro blue",
-          "Dark Cool Serif",
-          "Light Cool Creative",
-          "Dark Serif Warm",
-          "Dark Creative Warm",
-          "Red & Paper",
-          "Donut",
-          "Cyberpunk",
-          "Aurora Flux",
-          "Oak",
-          "Emerald Forest",
-          "Midnight Ember",
-          "Prismatica",
-          "Desert Bloom"
-        ],
-        "title": "ApiThemeId"
       },
       "Body_upload_images_api_v1_upload_images_post": {
         "properties": {
@@ -648,11 +661,7 @@
             "title": "Generation Id"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiGenerationStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/ApiGenerationStatus",
             "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
@@ -685,9 +694,6 @@
           },
           "generation_type": {
             "type": "string",
-            "enum": [
-              "presentation_export"
-            ],
             "const": "presentation_export",
             "title": "Generation Type",
             "default": "presentation_export"
@@ -861,6 +867,40 @@
         "type": "object",
         "title": "GenerateTranscriptInput"
       },
+      "GetPresentationsResponse": {
+        "properties": {
+          "presentations": {
+            "items": {
+              "$ref": "#/components/schemas/PresentationSnippet"
+            },
+            "type": "array",
+            "title": "Presentations",
+            "description": "List of presentations owned by the user"
+          }
+        },
+        "type": "object",
+        "required": [
+          "presentations"
+        ],
+        "title": "GetPresentationsResponse"
+      },
+      "GetThemesResponse": {
+        "properties": {
+          "themes": {
+            "items": {
+              "$ref": "#/components/schemas/ThemeSummary"
+            },
+            "type": "array",
+            "title": "Themes",
+            "description": "Themes available to the authenticated user"
+          }
+        },
+        "type": "object",
+        "required": [
+          "themes"
+        ],
+        "title": "GetThemesResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -882,12 +922,14 @@
             "description": "Generate AI images for slides. Disable to use only uploaded images or no images.",
             "default": true
           },
+          "include_web_images": {
+            "type": "boolean",
+            "title": "Include Web Images",
+            "description": "Search the web for relevant images to include in slides.",
+            "default": true
+          },
           "style": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AIImageStyleType"
-              }
-            ],
+            "$ref": "#/components/schemas/AIImageStyleType",
             "description": "AI image style: 'auto' (content-aware), 'realistic', 'artistic', 'cartoon', 'three_d', or 'custom'.",
             "default": "auto"
           },
@@ -948,88 +990,17 @@
           "Ukrainian",
           "Vietnamese",
           "Thai",
-          "Indonesian"
+          "Indonesian",
+          "Serbian",
+          "Croatian",
+          "Bosnian",
+          "Slovenian",
+          "Macedonian",
+          "Albanian",
+          "Montenegrin",
+          "Lithuanian"
         ],
         "title": "LanguageType"
-      },
-      "PresentationSummary": {
-        "properties": {
-          "presentation_id": {
-            "type": "string",
-            "title": "Presentation Id",
-            "description": "Unique identifier for the presentation"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title",
-            "description": "Title of the presentation"
-          },
-          "slide_count": {
-            "type": "integer",
-            "title": "Slide Count",
-            "description": "Number of slides in the presentation"
-          },
-          "theme_id": {
-            "type": "string",
-            "title": "Theme Id",
-            "description": "Visual theme applied to the presentation"
-          },
-          "created_at": {
-            "type": "string",
-            "title": "Created At",
-            "description": "ISO 8601 timestamp when the presentation was created"
-          },
-          "updated_at": {
-            "type": "string",
-            "title": "Updated At",
-            "description": "ISO 8601 timestamp when the presentation was last modified"
-          },
-          "thumbnail_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Thumbnail Url",
-            "description": "URL to the presentation thumbnail image"
-          }
-        },
-        "type": "object",
-        "required": [
-          "presentation_id",
-          "title",
-          "slide_count",
-          "theme_id",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "PresentationSummary"
-      },
-      "PresentationsListResponse": {
-        "properties": {
-          "presentations": {
-            "items": {
-              "$ref": "#/components/schemas/PresentationSummary"
-            },
-            "type": "array",
-            "title": "Presentations",
-            "description": "List of presentations"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "description": "Total number of presentations"
-          }
-        },
-        "type": "object",
-        "required": [
-          "presentations",
-          "total"
-        ],
-        "title": "PresentationsListResponse"
       },
       "PresentationGenerationStatus": {
         "properties": {
@@ -1038,11 +1009,7 @@
             "title": "Generation Id"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiGenerationStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/ApiGenerationStatus",
             "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
@@ -1075,9 +1042,6 @@
           },
           "generation_type": {
             "type": "string",
-            "enum": [
-              "presentation_generation"
-            ],
             "const": "presentation_generation",
             "title": "Generation Type",
             "default": "presentation_generation"
@@ -1127,20 +1091,13 @@
             "default": "API Generated Presentation"
           },
           "theme_id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiThemeId"
-              }
-            ],
-            "description": "Visual theme controlling colors, fonts, and styling",
-            "default": "Simple Light"
+            "type": "string",
+            "title": "Theme Id",
+            "description": "Theme ID controlling colors, fonts, and styling. Use GET /themes to discover available theme IDs. Legacy theme display names are still accepted for backward compatibility, but deprecated.",
+            "default": "27874e6b-8c1c-4301-bce7-d22e6e8df7d6"
           },
           "slide_range": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SlideRange"
-              }
-            ],
+            "$ref": "#/components/schemas/SlideRange",
             "description": "Target slide count. 'auto' analyzes input length. '1' generates a single slide. Ranges like '2-5' set bounds.",
             "default": "auto"
           },
@@ -1168,6 +1125,26 @@
         "type": "object",
         "title": "PresentationOptions"
       },
+      "PresentationSnippet": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique presentation identifier"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Presentation title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "PresentationSnippet"
+      },
       "SlideCreationStatus": {
         "properties": {
           "generation_id": {
@@ -1175,11 +1152,7 @@
             "title": "Generation Id"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiGenerationStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/ApiGenerationStatus",
             "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
@@ -1212,9 +1185,6 @@
           },
           "generation_type": {
             "type": "string",
-            "enum": [
-              "slide_creation"
-            ],
             "const": "slide_creation",
             "title": "Generation Type",
             "default": "slide_creation"
@@ -1358,11 +1328,7 @@
             "description": "Output language. If not set, matches the input language."
           },
           "tone": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ToneType"
-              }
-            ],
+            "$ref": "#/components/schemas/ToneType",
             "description": "Writing style: professional, casual, technical, educational, etc. Use 'custom' with tone_instructions for specific guidance.",
             "default": "DEFAULT"
           },
@@ -1379,11 +1345,7 @@
             "description": "Required when tone='custom'. Describe the desired voice and style."
           },
           "content_mode": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TextContentMode"
-              }
-            ],
+            "$ref": "#/components/schemas/TextContentMode",
             "description": "How to handle input content. 'preserve': use as-is. 'condense': shorten. 'enhance': expand with context. 'custom': follow content_instructions.",
             "default": "preserve"
           },
@@ -1400,11 +1362,7 @@
             "description": "Required when content_mode='custom'. Describe how to transform the content."
           },
           "amount_mode": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TextAmountMode"
-              }
-            ],
+            "$ref": "#/components/schemas/TextAmountMode",
             "description": "Text density per slide. 'minimal': keywords only. 'essential': key points. 'balanced': with context. 'detailed': comprehensive.",
             "default": "essential"
           },
@@ -1423,6 +1381,26 @@
         },
         "type": "object",
         "title": "TextOptions"
+      },
+      "ThemeSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique theme identifier"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Theme display name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ThemeSummary"
       },
       "ToneType": {
         "type": "string",
@@ -1448,11 +1426,7 @@
             "title": "Generation Id"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiGenerationStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/ApiGenerationStatus",
             "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
@@ -1485,9 +1459,6 @@
           },
           "generation_type": {
             "type": "string",
-            "enum": [
-              "transcript_generation"
-            ],
             "const": "transcript_generation",
             "title": "Generation Type",
             "default": "transcript_generation"
@@ -1569,14 +1540,14 @@
       }
     }
   },
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ],
   "servers": [
     {
       "url": "https://slides-api.getalai.com"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
     }
   ]
 }

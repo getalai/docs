@@ -1,0 +1,67 @@
+---
+title: "Get Themes"
+openapi: "GET /api/v1/themes"
+---
+
+Retrieve the themes available to the authenticated user.
+
+This endpoint returns both system themes and any user themes you can access. Use the returned `id` values as `presentation_options.theme_id` when generating presentations.
+
+<Note>
+  `theme_id` now primarily expects a theme ID from this endpoint. Legacy theme display names are still accepted for backward compatibility, but they are deprecated.
+</Note>
+
+---
+
+## Response
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `themes` | array | List of themes available to the authenticated user |
+
+### Theme Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique theme identifier to pass as `presentation_options.theme_id` |
+| `name` | string | Human-readable theme display name |
+
+---
+
+## Example Request
+
+```bash
+curl -X GET "https://slides-api.getalai.com/api/v1/themes" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Example Response
+
+```json
+{
+  "themes": [
+    {
+      "id": "27874e6b-8c1c-4301-bce7-d22e6e8df7d6",
+      "name": "Simple Light"
+    }
+  ]
+}
+```
+
+---
+
+## Using a Theme ID in Presentation Generation
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Quarterly business review content...",
+    "presentation_options": {
+      "title": "QBR",
+      "theme_id": "27874e6b-8c1c-4301-bce7-d22e6e8df7d6",
+      "slide_range": "6-10"
+    }
+  }'
+```

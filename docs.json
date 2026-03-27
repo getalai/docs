@@ -20,6 +20,7 @@
             "group": "Presentations",
             "pages": [
               "api/get-presentations",
+              "api/get-themes",
               "api/generations",
               "api/generation-status",
               "api/export-presentation",

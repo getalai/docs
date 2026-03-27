@@ -44,7 +44,7 @@ class AlaiClient:
         content: str,
         title: str = "Presentation",
         slide_range: str = "auto",
-        theme: str = "Simple Light",
+        theme_id: Optional[str] = None,
         export_formats: List[str] = None,
         image_ids: List[str] = None,
         wait: bool = True,
@@ -57,7 +57,7 @@ class AlaiClient:
             content: The text content to transform into slides
             title: Presentation title
             slide_range: Number of slides ("auto", "1", "2-5", "6-10", etc.)
-            theme: Visual theme ID
+            theme_id: Theme ID from get_themes(). Legacy theme display names still work but are deprecated.
             export_formats: List of formats ["link", "pdf", "ppt"]
             image_ids: List of image IDs from upload_images()
             wait: If True, polls until completion
@@ -73,11 +73,12 @@ class AlaiClient:
             "input_text": content,
             "presentation_options": {
                 "title": title,
-                "slide_range": slide_range,
-                "theme_id": theme
+                "slide_range": slide_range
             },
             "export_formats": export_formats
         }
+        if theme_id:
+            payload["presentation_options"]["theme_id"] = theme_id
         if image_ids:
             payload["image_ids"] = image_ids
 
@@ -92,6 +93,20 @@ class AlaiClient:
         if wait:
             return self.wait_for_completion(result["generation_id"], timeout)
         return result
+
+    def get_themes(self) -> List[dict]:
+        """
+        List available themes for the authenticated user.
+
+        Returns:
+            List of theme objects with `id` and `name`
+        """
+        response = requests.get(
+            f"{self.base_url}/themes",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json()["themes"]
 
     def wait_for_completion(self, generation_id: str, timeout: int = 300) -> dict:
         """
@@ -252,6 +267,7 @@ The most basic use case - turn text into a presentation.
 from alai_client import AlaiClient
 
 client = AlaiClient("your_api_key")
+theme_id = client.get_themes()[0]["id"]
 
 # Generate a presentation from text
 result = client.generate_presentation(
@@ -272,7 +288,7 @@ result = client.generate_presentation(
     """,
     title="Introduction to Machine Learning",
     slide_range="6-10",
-    theme="Simple Dark",
+    theme_id=theme_id,
     export_formats=["link", "pdf"]
 )
 
@@ -291,6 +307,7 @@ from alai_client import AlaiClient
 from datetime import datetime
 
 client = AlaiClient("your_api_key")
+default_theme_id = client.get_themes()[0]["id"]
 
 def generate_weekly_report(metrics: dict) -> dict:
     """Generate a weekly report presentation from metrics."""
@@ -327,7 +344,7 @@ def generate_weekly_report(metrics: dict) -> dict:
         content=content,
         title=f"Weekly Report - W{week_num}",
         slide_range="6-10",
-        theme="Royal Blue",
+        theme_id=default_theme_id,
         export_formats=["link", "pdf", "ppt"]
     )
 
@@ -640,7 +657,7 @@ except Exception as e:
   <Card title="API Reference" icon="book" href="/api/generations">
     Detailed documentation for all endpoints and parameters
   </Card>
-  <Card title="Available Themes" icon="palette" href="/api/introduction#available-themes">
-    Browse all 23 professionally designed themes
+  <Card title="Get Themes" icon="palette" href="/api/get-themes">
+    Discover theme IDs and names available to your account
   </Card>
 </CardGroup>

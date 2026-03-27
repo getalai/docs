@@ -28,12 +28,13 @@ Use it with Claude Desktop, Claude Code, Cursor, Windsurf, Cline, VS Code, and o
 
 ## Available Tools
 
-The Alai MCP server exposes 9 tools that map to the [Alai API](/api/introduction):
+The Alai MCP server exposes 10 tools that map to the [Alai API](/api/introduction):
 
 | Tool | Description |
 |------|-------------|
 | `ping` | Verify API key and return user ID |
 | `get_presentations` | List all presentations for the authenticated user |
+| `get_themes` | List theme IDs and names available to the authenticated user |
 | `generate_presentation` | Create a presentation from text content |
 | `get_generation_status` | Poll async operation status |
 | `create_slide` | Add a slide to an existing presentation |
@@ -339,10 +340,15 @@ The Alai MCP server exposes 9 tools that map to the [Alai API](/api/introduction
 Once configured, you can ask your AI agent to create presentations:
 
 <AccordionGroup>
+  <Accordion title="List available themes">
+    **Prompt**: "Show me the theme IDs I can use for a presentation"
+
+    The AI will call `get_themes` and return the available theme IDs and display names. Use those IDs with `generate_presentation`.
+  </Accordion>
   <Accordion title="Generate a presentation">
     **Prompt**: "Create a 5-slide presentation about the benefits of remote work"
 
-    The AI will call `generate_presentation` and poll `get_generation_status` until complete, then provide you with the link to your presentation.
+    The AI can call `get_themes` first if you want to choose a theme, then call `generate_presentation` and poll `get_generation_status` until complete.
   </Accordion>
   <Accordion title="Add a slide to an existing presentation">
     **Prompt**: "Add a slide about team collaboration tools to my presentation"

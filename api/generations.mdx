@@ -34,7 +34,7 @@ Generate a presentation from text content. This is an **async operation** - you 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `presentation_options.title` | string | "API Generated Presentation" | Title shown on title slide and in exports |
-| `presentation_options.theme_id` | string | "Simple Light" | Visual theme (see available themes) |
+| `presentation_options.theme_id` | string | `"27874e6b-8c1c-4301-bce7-d22e6e8df7d6"` | Theme ID controlling colors, fonts, and styling. Use `GET /themes` to discover available theme IDs. Legacy theme display names are still accepted for backward compatibility, but deprecated. |
 | `presentation_options.slide_range` | string | "auto" | Target slide count: `auto`, `1`, `2-5`, `6-10`, `11-15`, `16-20`, `21-25`, `26-50` |
 | `presentation_options.existing_presentation_id` | string | - | Append slides to existing presentation |
 | `presentation_options.total_variants_per_slide` | integer | 1 | Variants per slide (1-4) |
@@ -88,6 +88,7 @@ curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
 ### With Multiple Export Formats
 
 ```bash
+# First, discover a theme ID with GET /themes
 curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -96,7 +97,7 @@ curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
     "export_formats": ["link", "pdf", "ppt"],
     "presentation_options": {
       "title": "Q4 Sales Report",
-      "theme_id": "Simple Dark",
+      "theme_id": "27874e6b-8c1c-4301-bce7-d22e6e8df7d6",
       "slide_range": "6-10"
     },
     "text_options": {
@@ -104,6 +105,10 @@ curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
     }
   }'
 ```
+
+<Note>
+  `theme_id` now primarily expects a theme ID from `GET /themes`. Legacy theme display names still work for backward compatibility, but they are deprecated.
+</Note>
 
 ### Add to Existing Presentation
 
