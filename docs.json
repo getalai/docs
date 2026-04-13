@@ -21,6 +21,7 @@
             "pages": [
               "api/get-presentations",
               "api/get-themes",
+              "api/get-vibes",
               "api/generations",
               "api/generation-status",
               "api/export-presentation",

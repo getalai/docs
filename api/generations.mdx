@@ -21,6 +21,12 @@ Generate a presentation from text content. This is an **async operation** - you 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `input_text` | string | Content to transform into slides. Can be plain text, markdown, or structured notes. |
+
+### Optional Top-Level Fields
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `additional_instructions` | string | Extra guidance for the AI on style, focus areas, or specific requirements not captured by other options. |
 | `image_ids` | array of strings | IDs (UUIDs) of previously uploaded images from `POST /upload-images`. Images are matched to relevant slides automatically. |
 
 ### Export Formats
@@ -38,6 +44,7 @@ Generate a presentation from text content. This is an **async operation** - you 
 | `presentation_options.slide_range` | string | "auto" | Target slide count: `auto`, `1`, `2-5`, `6-10`, `11-15`, `16-20`, `21-25`, `26-50` |
 | `presentation_options.existing_presentation_id` | string | - | Append slides to existing presentation |
 | `presentation_options.total_variants_per_slide` | integer | 1 | Variants per slide (1-4) |
+| `presentation_options.vibe_id` | string | - | Vibe ID controlling the visual aesthetic of creative variants. Use `GET /vibes` to discover available vibe IDs. Requires `image_options.num_image_variants >= 1` when set. If omitted, standard theme styling is used. |
 
 ### Text Options
 
@@ -57,7 +64,7 @@ Generate a presentation from text content. This is an **async operation** - you 
 | `image_options.include_web_images` | boolean | true | Search the web for relevant images to include in slides |
 | `image_options.style` | string | "auto" | Image style: `auto`, `realistic`, `artistic`, `cartoon`, `three_d`, `custom` |
 | `image_options.style_instructions` | string | - | Required when style is `custom` |
-| `image_options.num_image_variants` | integer | 0 | Image slide variants (0-2) |
+| `image_options.num_image_variants` | integer | 0 | Number of creative image-led slide variants generated using Nano Banana Pro (0-2). Required (>=1) when `presentation_options.vibe_id` is set. Increases cost. |
 
 ---
 
@@ -109,6 +116,31 @@ curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
 
 <Note>
   `theme_id` now primarily expects a theme ID from `GET /themes`. Legacy theme display names still work for backward compatibility, but they are deprecated.
+</Note>
+
+### With a Vibe
+
+Vibes are visual aesthetic presets applied through creative image variants. Discover available vibe IDs with `GET /vibes`.
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Launch announcement for our new product line",
+    "presentation_options": {
+      "title": "Product Launch",
+      "vibe_id": "f1c2d3e4-5678-90ab-cdef-1234567890ab",
+      "slide_range": "6-10"
+    },
+    "image_options": {
+      "num_image_variants": 1
+    }
+  }'
+```
+
+<Note>
+  When `vibe_id` is set, `image_options.num_image_variants` must be `>= 1`. Vibes are applied through creative image variants.
 </Note>
 
 ### Add to Existing Presentation

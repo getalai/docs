@@ -1,0 +1,82 @@
+---
+title: "Get Vibes"
+openapi: "GET /api/v1/vibes"
+---
+
+Retrieve the vibes available to the authenticated user.
+
+A **vibe** is a visual aesthetic preset (mood, palette, illustration style) that gets applied to creative slide variants. This endpoint returns both system vibes and any custom vibes you have created. Use the returned `id` values as `presentation_options.vibe_id` when generating presentations.
+
+<Note>
+  Vibes are applied through creative image variants. When you pass `vibe_id`, you must also set `image_options.num_image_variants >= 1` on the generation request.
+</Note>
+
+---
+
+## Response
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `vibes` | array | List of vibes available to the authenticated user |
+
+### Vibe Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique vibe identifier to pass as `presentation_options.vibe_id` |
+| `name` | string | Human-readable vibe display name |
+| `source` | string | Either `system` (built-in) or `custom` (created by the user) |
+
+---
+
+## Example Request
+
+```bash
+curl -X GET "https://slides-api.getalai.com/api/v1/vibes" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Example Response
+
+```json
+{
+  "vibes": [
+    {
+      "id": "b8e3a9ae-f36c-458b-a816-acd5f43072d3",
+      "name": "Standard",
+      "source": "system"
+    },
+    {
+      "id": "f1c2d3e4-5678-90ab-cdef-1234567890ab",
+      "name": "Neon Dreams",
+      "source": "system"
+    },
+    {
+      "id": "a1b2c3d4-5678-90ab-cdef-fedcba987654",
+      "name": "My Brand Vibe",
+      "source": "custom"
+    }
+  ]
+}
+```
+
+---
+
+## Using a Vibe ID in Presentation Generation
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input_text": "Launch announcement for our new product line",
+    "presentation_options": {
+      "title": "Product Launch",
+      "vibe_id": "f1c2d3e4-5678-90ab-cdef-1234567890ab",
+      "slide_range": "6-10"
+    },
+    "image_options": {
+      "num_image_variants": 1
+    }
+  }'
+```

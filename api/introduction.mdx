@@ -203,6 +203,7 @@ These endpoints return results immediately.
 |----------|--------|-------------|
 | `/ping` | GET | Verify your API key |
 | `/themes` | GET | List theme IDs and names available to your account |
+| `/vibes` | GET | List vibe IDs, names, and source for visual style presets |
 | `/generations/{id}` | GET | Check generation status |
 | `/upload-images` | POST | Upload images for presentations |
 | `/presentations/{id}/slides/{slide_id}` | DELETE | Delete a slide |
@@ -234,6 +235,16 @@ Use `GET /themes` to discover the theme IDs and display names available to the a
 Theme selection now primarily uses `theme_id` values returned by that endpoint. Legacy theme display names are still accepted for backward compatibility, but they are deprecated.
 
 See the [Get Themes](/api/get-themes) reference for the response format and example usage.
+
+---
+
+## Vibes
+
+A **vibe** is a visual aesthetic preset (mood, palette, illustration style) applied to creative slide variants. Pass `presentation_options.vibe_id` on a generation request to use one.
+
+Use `GET /vibes` to discover the vibe IDs available to your account, including system vibes and any custom vibes you have created. When `vibe_id` is set, you must also set `image_options.num_image_variants >= 1` — vibes are applied through creative image variants.
+
+See the [Get Vibes](/api/get-vibes) reference for the response format and example usage.
 
 ---
 

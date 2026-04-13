@@ -19,9 +19,9 @@ Add a slide to an existing presentation. This is an **async operation** - poll t
 |-----------|------|---------|-------------|
 | `slide_context` | string | (required) | Content for this slide |
 | `options.additional_instructions` | string | - | Extra instructions for slide generation |
+| `options.slide_type` | string | `"classic"` | Slide style: `classic` for structured, editable text-led slides, or `creative` for image-led slides generated with Nano Banana Pro. |
 | `options.slide_order` | integer | (end) | Position in presentation (0-indexed) |
 | `options.total_variants_per_slide` | integer | 1 | Variants to generate (1-4) |
-| `options.num_image_variants` | integer | 0 | Image slide variants (0-2) |
 | `export_formats` | array | `["link"]` | Formats to export: `link`, `pdf`, `ppt` |
 
 ---
@@ -48,6 +48,20 @@ curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../sli
     "slide_context": "Key achievements: 25% revenue growth, 50 new clients",
     "options": {
       "additional_instructions": "Make it visual with icons"
+    }
+  }'
+```
+
+### Creative (Image-Led) Slide
+
+```bash
+curl -X POST "https://slides-api.getalai.com/api/v1/presentations/xyz789-.../slides" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "slide_context": "Hero shot of our new product against a sunset backdrop",
+    "options": {
+      "slide_type": "creative"
     }
   }'
 ```
