@@ -110,6 +110,83 @@ Authentication is handled via OAuth — your editor opens a browser window for s
 
 ---
 
+## Docs for AI
+
+Give your AI agent access to Alai's docs so it can look up API endpoints, authentication, webhooks, and more while building.
+
+<Tabs>
+  <Tab title="Claude Code">
+    Run this command in your terminal:
+
+    ```bash
+    claude mcp add alai-docs -- uvx mcpdoc --urls "https://docs.getalai.com/llms.txt"
+    ```
+  </Tab>
+
+  <Tab title="Claude Desktop">
+    Go to **Settings** → **Extensions** and add a new MCP server with these settings:
+
+    ```json
+    {
+      "mcpServers": {
+        "alai-docs": {
+          "command": "uvx",
+          "args": [
+            "mcpdoc",
+            "--urls",
+            "https://docs.getalai.com/llms.txt"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Cursor">
+    Open **Cursor Settings** → **MCP** and add a new server, or add to `~/.cursor/mcp.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "alai-docs": {
+          "command": "uvx",
+          "args": [
+            "mcpdoc",
+            "--urls",
+            "https://docs.getalai.com/llms.txt"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="VS Code">
+    Add to `.vscode/mcp.json` or run **MCP: Add Server** from the Command Palette:
+
+    ```json
+    {
+      "servers": {
+        "alai-docs": {
+          "command": "uvx",
+          "args": [
+            "mcpdoc",
+            "--urls",
+            "https://docs.getalai.com/llms.txt"
+          ]
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+Requires [`uv`](https://docs.astral.sh/uv/) (provides `uvx`). Install with `brew install uv` or see the [installation docs](https://docs.astral.sh/uv/getting-started/installation/) for other platforms.
+
+Uses [`mcpdoc`](https://github.com/langchain-ai/mcpdoc) by LangChain. Your agent gets a search tool over all Alai documentation, powered by the auto-generated [`llms.txt`](https://docs.getalai.com/llms.txt) and [`llms-full.txt`](https://docs.getalai.com/llms-full.txt) indexes.
+
+---
+
 ## Available Tools
 
 The Alai MCP server exposes 11 tools that map to the [Alai API](/api/introduction):
