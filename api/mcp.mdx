@@ -1,28 +1,112 @@
 ---
 title: "MCP Integration"
 sidebarTitle: "MCP (AI Agents)"
-description: "Connect AI agents like Claude, Cursor, and Windsurf to Alai using the Model Context Protocol."
+description: "Connect AI agents like Claude, Cursor, and VS Code to Alai using the Model Context Protocol."
 ---
 
-The **Alai MCP Server** allows AI agents to generate presentations, manage slides, and export content directly through the [Model Context Protocol](https://modelcontextprotocol.io/).
+The **Alai MCP Server** lets AI agents generate presentations, manage slides, and export content directly through the [Model Context Protocol](https://modelcontextprotocol.io/).
 
-Use it with Claude Desktop, Claude Code, Cursor, Windsurf, Cline, VS Code, and other MCP-compatible tools.
+Authentication is handled via OAuth — your editor opens a browser window for sign-in on first use. No API key required.
+
+**MCP URL:** `https://alai-standalone-backend.getalai.com/mcp/`
 
 ---
 
-## Quick Start
+## Getting Started
 
-<Steps>
-  <Step title="Get Your API Key">
-    Sign up at [app.getalai.com](https://app.getalai.com) and generate an API key from your account settings.
-  </Step>
-  <Step title="Configure Your MCP Client">
-    Add the Alai MCP server to your preferred AI tool using the configurations below.
-  </Step>
-  <Step title="Start Creating">
-    Ask your AI agent to generate presentations, add slides, or export to PDF/PowerPoint.
-  </Step>
-</Steps>
+<Tabs>
+  <Tab title="Claude Code">
+    Run this command in your terminal:
+
+    ```bash
+    claude mcp add --transport http alai https://alai-standalone-backend.getalai.com/mcp/
+    ```
+
+    Then type `/mcp` in a Claude Code session to initiate the OAuth sign-in flow.
+  </Tab>
+
+  <Tab title="Claude Desktop">
+    Go to **Settings** → **Connectors** and add a custom connector with this URL:
+
+    ```
+    https://alai-standalone-backend.getalai.com/mcp/
+    ```
+
+    Click the **+** button in the chat box, then **Connectors** to verify.
+
+    <Note>
+      Remote MCP connectors are available on Claude Pro, Max, Team, and Enterprise plans.
+    </Note>
+  </Tab>
+
+  <Tab title="Cursor">
+    Open **Cursor Settings** → **MCP** and add a new server, or add to `~/.cursor/mcp.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "alai": {
+          "type": "streamable-http",
+          "url": "https://alai-standalone-backend.getalai.com/mcp/"
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="VS Code">
+    <Note>
+      Requires VS Code 1.102 or later.
+    </Note>
+
+    Open the Command Palette (**Cmd/Ctrl + Shift + P**), run **MCP: Add Server**, and select **HTTP**. Use this URL:
+
+    ```
+    https://alai-standalone-backend.getalai.com/mcp/
+    ```
+
+    Or add it to `.vscode/mcp.json`:
+
+    ```json
+    {
+      "servers": {
+        "alai": {
+          "type": "http",
+          "url": "https://alai-standalone-backend.getalai.com/mcp/"
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Windsurf">
+    Go to **Windsurf Settings** → **Manage MCPs** → **View raw config** and add:
+
+    ```json
+    {
+      "mcpServers": {
+        "alai": {
+          "serverUrl": "https://alai-standalone-backend.getalai.com/mcp/"
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="ChatGPT">
+    Go to **Settings** → **Connectors** → **Add connector** and enter:
+
+    ```
+    https://alai-standalone-backend.getalai.com/mcp/
+    ```
+
+    ChatGPT will open a browser window for OAuth sign-in.
+
+    <Note>
+      Custom connectors are available on ChatGPT Pro, Business, and Enterprise plans.
+    </Note>
+  </Tab>
+</Tabs>
 
 ---
 
@@ -32,7 +116,7 @@ The Alai MCP server exposes 11 tools that map to the [Alai API](/api/introductio
 
 | Tool | Description |
 |------|-------------|
-| `ping` | Verify API key and return user ID |
+| `ping` | Verify authentication and return user ID |
 | `get_presentations` | List all presentations for the authenticated user |
 | `get_themes` | List theme IDs and names available to the authenticated user |
 | `get_vibes` | List vibe IDs, names, and source (system or custom) for visual style presets |
@@ -46,333 +130,51 @@ The Alai MCP server exposes 11 tools that map to the [Alai API](/api/introductio
 
 ---
 
-## Client Configuration
-
-<Tabs>
-  <Tab title="Claude Desktop">
-    ### Claude Desktop
-
-    Claude Desktop supports remote MCP servers via the **Connectors** settings (Pro, Max, Team, and Enterprise plans).
-
-    **Option 1: Via Settings UI (Recommended)**
-
-    1. Open Claude Desktop
-    2. Go to **Settings** → **Connectors**
-    3. Add a new connector with the Alai MCP URL
-
-    **Option 2: Via mcp-remote**
-
-    Edit your `claude_desktop_config.json`:
-
-    <Tabs>
-      <Tab title="macOS">
-        ```
-        ~/Library/Application Support/Claude/claude_desktop_config.json
-        ```
-      </Tab>
-      <Tab title="Windows">
-        ```
-        %APPDATA%\Claude\claude_desktop_config.json
-        ```
-      </Tab>
-    </Tabs>
-
-    Add the following configuration:
-
-    ```json
-    {
-      "mcpServers": {
-        "alai": {
-          "command": "npx",
-          "args": [
-            "mcp-remote@latest",
-            "https://slides-api.getalai.com/mcp/",
-            "--header",
-            "Authorization: Bearer YOUR_API_KEY"
-          ]
-        }
-      }
-    }
-    ```
-
-    <Warning>
-      Replace `YOUR_API_KEY` with your actual Alai API key.
-    </Warning>
-
-    Restart Claude Desktop after saving the configuration.
-  </Tab>
-
-  <Tab title="Claude Code">
-    ### Claude Code (CLI)
-
-    Add the Alai MCP server using the CLI:
-
-    ```bash
-    claude mcp add alai \
-      --transport http \
-      https://slides-api.getalai.com/mcp/ \
-      -H "Authorization: Bearer YOUR_API_KEY"
-    ```
-
-    Or add it via JSON configuration:
-
-    ```bash
-    claude mcp add-json alai '{
-      "type": "http",
-      "url": "https://slides-api.getalai.com/mcp/",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
-      }
-    }'
-    ```
-
-    Verify the server is added:
-
-    ```bash
-    claude mcp list
-    ```
-  </Tab>
-
-  <Tab title="Cursor">
-    ### Cursor
-
-    1. Open Cursor Settings (**Cmd/Ctrl + ,**)
-    2. Navigate to **MCP** section
-    3. Click **Add new global MCP server**
-    4. Add the following configuration:
-
-    ```json
-    {
-      "mcpServers": {
-        "alai": {
-          "command": "npx",
-          "args": [
-            "mcp-remote@latest",
-            "https://slides-api.getalai.com/mcp/",
-            "--header",
-            "Authorization: Bearer YOUR_API_KEY"
-          ]
-        }
-      }
-    }
-    ```
-
-    Alternatively, create a `.cursor/mcp.json` file in your project:
-
-    ```json
-    {
-      "mcpServers": {
-        "alai": {
-          "command": "npx",
-          "args": [
-            "mcp-remote@latest",
-            "https://slides-api.getalai.com/mcp/",
-            "--header",
-            "Authorization: Bearer YOUR_API_KEY"
-          ]
-        }
-      }
-    }
-    ```
-  </Tab>
-
-  <Tab title="Windsurf">
-    ### Windsurf
-
-    1. Go to **File** → **Preferences** → **Windsurf Settings**
-    2. Select **Manage MCPs**
-    3. Click **View raw config** to open `mcp_config.json`
-
-    Add the following configuration:
-
-    ```json
-    {
-      "mcpServers": {
-        "alai": {
-          "serverUrl": "https://slides-api.getalai.com/mcp/",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-
-    <Tabs>
-      <Tab title="macOS/Linux">
-        Config location: `~/.codeium/windsurf/mcp_config.json`
-      </Tab>
-      <Tab title="Windows">
-        Config location: `%USERPROFILE%\.codeium\windsurf\mcp_config.json`
-      </Tab>
-    </Tabs>
-  </Tab>
-
-  <Tab title="VS Code">
-    ### VS Code (Copilot)
-
-    <Note>
-      MCP support in VS Code requires version 1.102 or later.
-    </Note>
-
-    1. Open Command Palette (**Cmd/Ctrl + Shift + P**)
-    2. Run **MCP: Edit User Configuration**
-    3. Add the Alai server:
-
-    ```json
-    {
-      "mcp": {
-        "servers": {
-          "alai": {
-            "command": "npx",
-            "args": [
-              "mcp-remote@latest",
-              "https://slides-api.getalai.com/mcp/",
-              "--header",
-              "Authorization: Bearer YOUR_API_KEY"
-            ]
-          }
-        }
-      }
-    }
-    ```
-
-    Or create `.vscode/mcp.json` in your workspace for project-specific configuration.
-  </Tab>
-
-  <Tab title="Cline">
-    ### Cline (VS Code Extension)
-
-    1. Click the **MCP Servers** icon in the Cline extension
-    2. Select the **Configure** tab
-    3. Click **Advanced MCP Settings** to open `cline_mcp_settings.json`
-
-    Add the following configuration:
-
-    ```json
-    {
-      "mcpServers": {
-        "alai": {
-          "command": "npx",
-          "args": [
-            "mcp-remote@latest",
-            "https://slides-api.getalai.com/mcp/",
-            "--header",
-            "Authorization: Bearer YOUR_API_KEY"
-          ],
-          "alwaysAllow": [],
-          "disabled": false
-        }
-      }
-    }
-    ```
-
-    <Tabs>
-      <Tab title="macOS">
-        Config location: `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
-      </Tab>
-      <Tab title="Windows">
-        Config location: `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`
-      </Tab>
-    </Tabs>
-  </Tab>
-
-  <Tab title="Zed">
-    ### Zed Editor
-
-    Add the configuration to your `settings.json`:
-
-    ```json
-    {
-      "context_servers": {
-        "alai": {
-          "command": {
-            "path": "npx",
-            "args": [
-              "mcp-remote@latest",
-              "https://slides-api.getalai.com/mcp/",
-              "--header",
-              "Authorization: Bearer YOUR_API_KEY"
-            ]
-          }
-        }
-      }
-    }
-    ```
-
-    Check the Agent Panel settings to verify the server is active (green indicator).
-
-    <Note>
-      Zed currently requires `mcp-remote` for HTTP-based MCP servers. Native streamable HTTP support may be added in future versions.
-    </Note>
-  </Tab>
-
-  <Tab title="JetBrains">
-    ### JetBrains IDEs (AI Assistant)
-
-    JetBrains AI Assistant supports MCP servers in IntelliJ IDEA, PyCharm, WebStorm, and other JetBrains IDEs.
-
-    1. Go to **Settings** → **Tools** → **AI Assistant** → **Model Context Protocol**
-    2. Click **Add** to configure a new server
-    3. Use the following configuration:
-
-    ```json
-    {
-      "alai": {
-        "command": "npx",
-        "args": [
-          "mcp-remote@latest",
-          "https://slides-api.getalai.com/mcp/",
-          "--header",
-          "Authorization: Bearer YOUR_API_KEY"
-        ]
-      }
-    }
-    ```
-
-    Refer to the [JetBrains MCP documentation](https://www.jetbrains.com/help/ai-assistant/mcp.html) for detailed instructions.
-  </Tab>
-</Tabs>
-
----
-
 ## Example Usage
 
-Once configured, you can ask your AI agent to create presentations:
+Once connected, ask your AI agent to create presentations:
 
 <AccordionGroup>
   <Accordion title="List available themes">
     **Prompt**: "Show me the theme IDs I can use for a presentation"
 
-    The AI will call `get_themes` and return the available theme IDs and display names. Use those IDs with `generate_presentation`.
+    The AI will call `get_themes` and return the available theme IDs and display names.
   </Accordion>
   <Accordion title="Generate a presentation">
     **Prompt**: "Create a 5-slide presentation about the benefits of remote work"
 
-    The AI can call `get_themes` first if you want to choose a theme, then call `generate_presentation` and poll `get_generation_status` until complete.
+    The AI can call `get_themes` first to pick a theme, then `generate_presentation` and poll `get_generation_status` until complete.
   </Accordion>
   <Accordion title="Add a slide to an existing presentation">
     **Prompt**: "Add a slide about team collaboration tools to my presentation"
-
-    The AI will use `create_slide` with your presentation ID and the new content.
   </Accordion>
   <Accordion title="Export to PowerPoint">
     **Prompt**: "Export my presentation as a PowerPoint file"
-
-    The AI will call `export_presentation` with format `pptx` and provide the download link.
   </Accordion>
   <Accordion title="Generate speaker notes">
     **Prompt**: "Create speaker notes for all slides in my presentation"
-
-    The AI will use `generate_transcripts` to create detailed speaker notes for each slide.
   </Accordion>
 </AccordionGroup>
 
 ---
 
+## Authentication
+
+Authentication is handled via OAuth 2.1. On first connection, your editor opens a browser window where you sign in to Alai. Tokens refresh automatically.
+
+MCP clients discover OAuth configuration via:
+
+```
+GET https://alai-standalone-backend.getalai.com/.well-known/oauth-protected-resource/mcp
+```
+
+For programmatic access (CI, scripts, direct HTTP), use the [Alai REST API](/api/introduction) with an API key instead.
+
+---
+
 ## Workflow
 
-Presentation generation is asynchronous. Here's how it works:
+Presentation generation is asynchronous:
 
 ```mermaid
 sequenceDiagram
@@ -399,7 +201,7 @@ sequenceDiagram
 ```
 
 <Tip>
-  Most AI agents will handle the polling automatically. You just need to describe what you want, and the agent will manage the async workflow.
+  Most AI agents handle polling automatically. Just describe what you want and the agent will manage the async workflow.
 </Tip>
 
 ---
@@ -407,63 +209,24 @@ sequenceDiagram
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="Server not connecting">
-    - Verify your API key is correct
-    - Ensure you have `npx` installed (comes with Node.js)
+  <Accordion title="OAuth sign-in window doesn't open">
+    - Make sure your client supports remote MCP servers with OAuth (Claude Code, Claude Desktop, Cursor, VS Code 1.102+, ChatGPT)
     - Check that your firewall allows outbound HTTPS connections
-    - Restart your MCP client after configuration changes
+    - Restart your MCP client after adding the server
   </Accordion>
   <Accordion title="Authentication errors">
-    - API keys should start with `sk_`
-    - Ensure the `Authorization` header format is `Bearer YOUR_API_KEY`
-    - Generate a new API key from [app.getalai.com](https://app.getalai.com) if needed
+    - Re-run the OAuth sign-in flow from your client's MCP settings
+    - Make sure you're signed in to the same Alai account your presentations belong to
   </Accordion>
   <Accordion title="Tools not appearing">
     - Some clients require a restart after adding MCP servers
-    - Check your client's MCP settings to ensure the server is enabled
     - Verify the server status indicator (should be green/active)
   </Accordion>
   <Accordion title="Rate limits">
     - Maximum 5 concurrent generations per user
-    - If you hit rate limits, wait a few seconds before retrying
     - Contact [founders@getalai.com](mailto:founders@getalai.com) for higher limits
   </Accordion>
 </AccordionGroup>
-
----
-
-## Security
-
-<Warning>
-  Never share your API key or commit it to version control. Use environment variables when possible.
-</Warning>
-
-For environment variable configuration, you can reference variables in your MCP config:
-
-```json
-{
-  "mcpServers": {
-    "alai": {
-      "command": "npx",
-      "args": [
-        "mcp-remote@latest",
-        "https://slides-api.getalai.com/mcp/",
-        "--header",
-        "Authorization: Bearer ${ALAI_API_KEY}"
-      ],
-      "env": {
-        "ALAI_API_KEY": "your_api_key_here"
-      }
-    }
-  }
-}
-```
-
-Or set the environment variable in your shell:
-
-```bash
-export ALAI_API_KEY="sk_your_api_key"
-```
 
 ---
 
