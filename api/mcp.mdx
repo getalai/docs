@@ -8,7 +8,7 @@ The **Alai MCP Server** lets AI agents generate presentations, manage slides, an
 
 Authentication is handled via OAuth — your editor opens a browser window for sign-in on first use. No API key required.
 
-**MCP URL:** `https://alai-standalone-backend.getalai.com/mcp/`
+**MCP URL:** `https://slides-api.getalai.com/mcp/`
 
 ---
 
@@ -19,7 +19,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
     Run this command in your terminal:
 
     ```bash
-    claude mcp add --transport http alai https://alai-standalone-backend.getalai.com/mcp/
+    claude mcp add --transport http alai https://slides-api.getalai.com/mcp/
     ```
 
     Then type `/mcp` in a Claude Code session to initiate the OAuth sign-in flow.
@@ -29,7 +29,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
     Go to **Settings** → **Connectors** and add a custom connector with this URL:
 
     ```
-    https://alai-standalone-backend.getalai.com/mcp/
+    https://slides-api.getalai.com/mcp/
     ```
 
     Click the **+** button in the chat box, then **Connectors** to verify.
@@ -47,7 +47,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
       "mcpServers": {
         "alai": {
           "type": "streamable-http",
-          "url": "https://alai-standalone-backend.getalai.com/mcp/"
+          "url": "https://slides-api.getalai.com/mcp/"
         }
       }
     }
@@ -62,7 +62,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
     Open the Command Palette (**Cmd/Ctrl + Shift + P**), run **MCP: Add Server**, and select **HTTP**. Use this URL:
 
     ```
-    https://alai-standalone-backend.getalai.com/mcp/
+    https://slides-api.getalai.com/mcp/
     ```
 
     Or add it to `.vscode/mcp.json`:
@@ -72,7 +72,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
       "servers": {
         "alai": {
           "type": "http",
-          "url": "https://alai-standalone-backend.getalai.com/mcp/"
+          "url": "https://slides-api.getalai.com/mcp/"
         }
       }
     }
@@ -86,7 +86,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
     {
       "mcpServers": {
         "alai": {
-          "serverUrl": "https://alai-standalone-backend.getalai.com/mcp/"
+          "serverUrl": "https://slides-api.getalai.com/mcp/"
         }
       }
     }
@@ -97,7 +97,7 @@ Authentication is handled via OAuth — your editor opens a browser window for s
     Go to **Settings** → **Connectors** → **Add connector** and enter:
 
     ```
-    https://alai-standalone-backend.getalai.com/mcp/
+    https://slides-api.getalai.com/mcp/
     ```
 
     ChatGPT will open a browser window for OAuth sign-in.
@@ -242,7 +242,7 @@ Authentication is handled via OAuth 2.1. On first connection, your editor opens 
 MCP clients discover OAuth configuration via:
 
 ```
-GET https://alai-standalone-backend.getalai.com/.well-known/oauth-protected-resource/mcp
+GET https://slides-api.getalai.com/.well-known/oauth-protected-resource/mcp
 ```
 
 For programmatic access (CI, scripts, direct HTTP), use the [Alai REST API](/api/introduction) with an API key instead.
