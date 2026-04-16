@@ -1359,27 +1359,6 @@
         ],
         "title": "SlideTranscript"
       },
-      "TextAmountMode": {
-        "type": "string",
-        "enum": [
-          "minimal",
-          "essential",
-          "balanced",
-          "detailed",
-          "custom"
-        ],
-        "title": "TextAmountMode"
-      },
-      "TextContentMode": {
-        "type": "string",
-        "enum": [
-          "enhance",
-          "condense",
-          "preserve",
-          "custom"
-        ],
-        "title": "TextContentMode"
-      },
       "TextOptions": {
         "properties": {
           "language": {
@@ -1392,57 +1371,6 @@
               }
             ],
             "description": "Output language. If not set, matches the input language."
-          },
-          "tone": {
-            "$ref": "#/components/schemas/ToneType",
-            "description": "Writing style: professional, casual, technical, educational, etc. Use 'custom' with tone_instructions for specific guidance.",
-            "default": "DEFAULT"
-          },
-          "tone_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tone Instructions",
-            "description": "Required when tone='custom'. Describe the desired voice and style."
-          },
-          "content_mode": {
-            "$ref": "#/components/schemas/TextContentMode",
-            "description": "How to handle input content. 'preserve': use as-is. 'condense': shorten. 'enhance': expand with context. 'custom': follow content_instructions.",
-            "default": "preserve"
-          },
-          "content_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Content Instructions",
-            "description": "Required when content_mode='custom'. Describe how to transform the content."
-          },
-          "amount_mode": {
-            "$ref": "#/components/schemas/TextAmountMode",
-            "description": "Text density per slide. 'minimal': keywords only. 'essential': key points. 'balanced': with context. 'detailed': comprehensive.",
-            "default": "essential"
-          },
-          "amount_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Amount Instructions",
-            "description": "Required when amount_mode='custom'. Describe the desired text density."
           }
         },
         "type": "object",
@@ -1467,23 +1395,6 @@
           "name"
         ],
         "title": "ThemeSummary"
-      },
-      "ToneType": {
-        "type": "string",
-        "enum": [
-          "DEFAULT",
-          "PROFESSIONAL",
-          "CASUAL",
-          "TECHNICAL",
-          "EDUCATIONAL",
-          "INSPIRATIONAL",
-          "NARRATIVE",
-          "PERSUASIVE",
-          "AUTHORITATIVE",
-          "EMPATHETIC",
-          "CUSTOM"
-        ],
-        "title": "ToneType"
       },
       "TranscriptStatus": {
         "properties": {

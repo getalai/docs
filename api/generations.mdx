@@ -51,10 +51,6 @@ Generate a presentation from text content. This is an **async operation** - you 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `text_options.language` | string | (auto) | Output language |
-| `text_options.tone` | string | "DEFAULT" | Writing style: `DEFAULT`, `PROFESSIONAL`, `CASUAL`, `TECHNICAL`, `EDUCATIONAL`, `INSPIRATIONAL`, `NARRATIVE`, `PERSUASIVE`, `AUTHORITATIVE`, `EMPATHETIC`, `CUSTOM` |
-| `text_options.tone_instructions` | string | - | Required when tone is `CUSTOM` |
-| `text_options.content_mode` | string | "PRESERVE" | How to handle input: `PRESERVE`, `CONDENSE`, `ENHANCE`, `CUSTOM` |
-| `text_options.amount_mode` | string | "ESSENTIAL" | Text density: `MINIMAL`, `ESSENTIAL`, `BALANCED`, `DETAILED`, `CUSTOM` |
 
 ### Image Options
 
@@ -108,9 +104,6 @@ curl -X POST "https://slides-api.getalai.com/api/v1/generations" \
       "theme_id": "27874e6b-8c1c-4301-bce7-d22e6e8df7d6",
       "slide_range": "6-10"
     },
-    "text_options": {
-      "tone": "PROFESSIONAL"
-    }
   }'
 ```
 
