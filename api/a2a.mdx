@@ -4,7 +4,7 @@ sidebarTitle: "A2A (Agent Protocol)"
 description: "Let other AI agents edit Alai presentations using the Agent2Agent (A2A) protocol."
 ---
 
-The **Alai A2A Agent** lets external agents drive Alai presentations through Google's [Agent2Agent (A2A) protocol](https://github.com/google-a2a) — a standard that lets one agent call another over HTTP+JSON with first-class support for long-running tasks, streaming, and human-in-the-loop pauses.
+The **Alai A2A Agent** lets external agents drive Alai presentations through the [Agent2Agent (A2A) protocol](https://a2a-protocol.org/) — an open standard (originally from Google, now stewarded by the [a2aproject](https://github.com/a2aproject)) that lets one agent call another over HTTP+JSON with first-class support for long-running tasks, streaming, and human-in-the-loop pauses.
 
 Use A2A when your own agent (or product) needs to _delegate_ presentation editing work to the Alai Agent and get back a structured task lifecycle, not just a one-shot REST response.
 
@@ -289,7 +289,7 @@ Alai's A2A server exposes the standard set of REST endpoints defined by the prot
 | `POST` | `/tasks/{id}:subscribe`        | Re-attach to an in-flight task's event stream after disconnect.                     |
 | `GET`  | `/tasks`                       | List recent tasks (filterable by `context_id`, `status`, `status_timestamp_after`). |
 
-All endpoints except agent-card discovery require `Authorization: Bearer YOUR_API_KEY`. The wire format follows the [A2A protocol spec](https://github.com/google-a2a).
+All endpoints except agent-card discovery require `Authorization: Bearer YOUR_API_KEY`. The wire format follows the [A2A protocol v1.0 specification](https://a2a-protocol.org/v1.0.0/specification/).
 
 ---
 
