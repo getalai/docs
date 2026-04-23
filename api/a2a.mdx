@@ -118,7 +118,7 @@ Example response (abridged):
 A single streaming edit request looks like this on the wire. For Python, TypeScript, or other languages, use the official [`a2a-sdk`](https://pypi.org/project/a2a-sdk/), which wraps these endpoints in idiomatic clients.
 
 ```bash
-curl -X POST "https://alai-standalone-backend.getalai.com/a2a/v1/message:stream" \
+curl -X POST "https://alai-standalone-backend.getalai.com/a2a/message:stream" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -H "A2A-Version: 1.0" \
@@ -199,7 +199,7 @@ sequenceDiagram
     participant Client as Your Agent
     participant Agent as Alai Agent
 
-    Client->>Agent: POST /v1/message:stream (text + presentation_id)
+    Client->>Agent: POST /message:stream (text + presentation_id)
     Agent-->>Client: status_update: SUBMITTED
     Agent-->>Client: status_update: WORKING
     Agent-->>Client: artifact: presentation_url
@@ -282,11 +282,12 @@ Alai's A2A server exposes the standard set of REST endpoints defined by the prot
 | Method | Path                           | Purpose                                                                             |
 | ------ | ------------------------------ | ----------------------------------------------------------------------------------- |
 | `GET`  | `/.well-known/agent-card.json` | Fetch the public agent card (no auth required).                                     |
-| `POST` | `/v1/message:send`             | Send a message and wait for the final task.                                         |
-| `POST` | `/v1/message:stream`           | Send a message and stream task events as they happen (recommended).                 |
-| `GET`  | `/v1/tasks/{id}`               | Fetch the current state of a task.                                                  |
-| `POST` | `/v1/tasks/{id}:cancel`        | Cancel an in-flight task.                                                           |
-| `GET`  | `/v1/tasks`                    | List recent tasks (filterable by `context_id`, `status`, `status_timestamp_after`). |
+| `POST` | `/message:send`                | Send a message and wait for the final task.                                         |
+| `POST` | `/message:stream`              | Send a message and stream task events as they happen (recommended).                 |
+| `GET`  | `/tasks/{id}`                  | Fetch the current state of a task.                                                  |
+| `POST` | `/tasks/{id}:cancel`           | Cancel an in-flight task.                                                           |
+| `POST` | `/tasks/{id}:subscribe`        | Re-attach to an in-flight task's event stream after disconnect.                     |
+| `GET`  | `/tasks`                       | List recent tasks (filterable by `context_id`, `status`, `status_timestamp_after`). |
 
 All endpoints except agent-card discovery require `Authorization: Bearer YOUR_API_KEY`. The wire format follows the [A2A protocol spec](https://github.com/google-a2a).
 
