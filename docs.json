@@ -15,6 +15,7 @@
         "pages": [
           "api/introduction",
           "api/mcp",
+          "api/a2a",
           "api/examples",
           {
             "group": "Presentations",
