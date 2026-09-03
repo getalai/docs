@@ -1,0 +1,12 @@
+---
+title: "Verify Authentication"
+openapi: "GET /api/modern/v1/ping"
+---
+
+Verify that your Bearer token can access the Modern Slides API and confirm the API version before starting a workflow.
+
+```bash
+curl "https://slides-api.getalai.com/api/modern/v1/ping" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+

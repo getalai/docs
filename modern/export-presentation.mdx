@@ -1,0 +1,21 @@
+---
+title: "Export Presentation"
+openapi: "POST /api/modern/v1/presentations/{presentation_id}/exports"
+---
+
+Export the current Modern artifact to one or more formats: `pdf`, `pptx`, and `png`. The request returns an asynchronous operation. When it succeeds, `result.formats` contains signed download URLs valid for 24 hours. A multi-page PNG export may be returned as a ZIP archive.
+
+```json
+{
+  "formats": ["pdf", "pptx", "png"],
+  "filename": "station-pitch",
+  "scale": 1.0,
+  "disable_shadows": false,
+  "compress_pdf": false,
+  "base_commit_sha": "CURRENT_COMMIT_SHA",
+  "idempotency_key": "futuri-export-123"
+}
+```
+
+Use `base_commit_sha` when the export must correspond to a specific presentation revision.
+

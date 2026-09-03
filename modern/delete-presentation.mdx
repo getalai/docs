@@ -1,0 +1,11 @@
+---
+title: "Delete Presentation"
+openapi: "DELETE /api/modern/v1/presentations/{presentation_id}"
+---
+
+Delete an owned Modern presentation and its Modern artifact files. A successful deletion returns `204 No Content`.
+
+<Warning>
+  Deletion is permanent. In-flight operations for the presentation should be allowed to finish or fail before deletion.
+</Warning>
+

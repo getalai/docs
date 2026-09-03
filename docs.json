@@ -11,7 +11,7 @@
   "navigation": {
     "groups": [
       {
-        "group": "Alai API (Beta)",
+        "group": "Classic & Creative Slides API (Beta)",
         "pages": [
           "api/introduction",
           "api/mcp",
@@ -36,6 +36,39 @@
             ]
           },
           "api/upload-images"
+        ]
+      },
+      {
+        "group": "Modern Slides API (Beta)",
+        "pages": [
+          "modern/introduction",
+          {
+            "group": "Start Here",
+            "pages": [
+              "modern/ping",
+              "modern/models",
+              "modern/design-systems"
+            ]
+          },
+          {
+            "group": "Presentations",
+            "pages": [
+              "modern/create-presentation",
+              "modern/list-presentations",
+              "modern/get-presentation",
+              "modern/delete-presentation",
+              "modern/upload-assets"
+            ]
+          },
+          {
+            "group": "AI Operations",
+            "pages": [
+              "modern/generate-presentation",
+              "modern/edit-presentation",
+              "modern/export-presentation",
+              "modern/get-operation"
+            ]
+          }
         ]
       }
     ]

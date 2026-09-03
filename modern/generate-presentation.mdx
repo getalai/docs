@@ -1,0 +1,25 @@
+---
+title: "Generate Presentation"
+openapi: "POST /api/modern/v1/presentations/{presentation_id}/generate"
+---
+
+Generate the initial Modern artifact using Alai's agentic presentation workflow. The request returns `202 Accepted` with an operation to poll.
+
+`slide_count` is exact when supplied. `asset_ids` must refer to assets uploaded to this presentation. Use a model ID returned by `GET /models`, or omit `model` to use the default.
+
+```json
+{
+  "content": "Pitch content and source material...",
+  "instructions": "Create a polished client pitch for a radio station.",
+  "slide_count": 8,
+  "asset_ids": ["LOGO_ASSET_ID"],
+  "model": {
+    "id": "anthropic/claude-opus-4.8",
+    "fallback_policy": "deny"
+  },
+  "idempotency_key": "futuri-job-123"
+}
+```
+
+Poll `GET /operations/{operation_id}` until the operation reaches `succeeded` or `failed`.
+

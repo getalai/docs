@@ -1,0 +1,17 @@
+---
+title: "Upload Assets"
+openapi: "POST /api/modern/v1/presentations/{presentation_id}/assets"
+---
+
+Upload one or more images with semantic usage metadata. Every file in a request shares the same metadata; send separate requests when assets need different roles, scopes, or instructions.
+
+Roles are `brand_logo`, `reference_image`, `content_image`, and `background`. Scopes are `all_slides` and `generation`. Save the returned asset IDs and pass them to generate or edit operations.
+
+```bash
+curl -X POST \
+  "https://slides-api.getalai.com/api/modern/v1/presentations/PRESENTATION_ID/assets" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F 'metadata={"role":"brand_logo","scope":"all_slides","instructions":"Keep this logo visible and consistent."}' \
+  -F 'files=@station-logo.png'
+```
+

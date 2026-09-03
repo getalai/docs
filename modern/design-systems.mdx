@@ -1,0 +1,13 @@
+---
+title: "List Design Systems"
+openapi: "GET /api/modern/v1/design-systems"
+---
+
+List the published design systems available to the authenticated user. Use a returned `id` as `design_system_id` when creating a presentation.
+
+Modern Slides can work with any published design system available to your account, including your organization's custom fonts, colors, components, and visual language. Draft or inaccessible design systems are not returned.
+
+<Note>
+  A design system is required when `artifact_format` is `presentation`. Other supported artifact formats may omit it.
+</Note>
+

@@ -1,0 +1,20 @@
+---
+title: "Create Presentation"
+openapi: "POST /api/modern/v1/presentations"
+---
+
+Create an empty Modern presentation container. This synchronous request returns `201 Created`; call the generate endpoint afterward to build its content.
+
+For `artifact_format: "presentation"`, provide the ID of a published design system. Canvas presets are `16:9`, `4:3`, `1:1`, and `custom`. A custom canvas requires both `width` and `height`.
+
+```json
+{
+  "title": "Futuri station pitch",
+  "artifact_format": "presentation",
+  "canvas": { "preset": "16:9" },
+  "design_system_id": "YOUR_PUBLISHED_DESIGN_SYSTEM_ID"
+}
+```
+
+Supported artifact formats are `presentation`, `infographic`, `carousel`, `poster`, and `social_post`.
+

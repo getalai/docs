@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Alai API",
-    "description": "API endpoints for programmatic access to Alai presentation generation",
-    "version": "1.0.0"
+    "description": "API endpoints for Alai Classic, Creative, and Modern presentation generation",
+    "version": "1.1.0"
   },
   "paths": {
     "/api/v1/ping": {
@@ -235,7 +235,7 @@
           "External API"
         ],
         "summary": "Add a slide to an existing presentation",
-        "description": "Add a new slide to an existing presentation. This is an async operation\u2014poll the returned `generation_id` for completion.\n\nThe slide content will be transformed into a professionally designed slide with AI-generated layout and optional images.",
+        "description": "Add a new slide to an existing presentation. This is an async operation—poll the returned `generation_id` for completion.\n\nThe slide content will be transformed into a professionally designed slide with AI-generated layout and optional images.",
         "operationId": "create_slide_api_v1_presentations__presentation_id__slides_post",
         "parameters": [
           {
@@ -480,6 +480,488 @@
           }
         }
       }
+    },
+    "/api/modern/v1/ping": {
+      "get": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Ping",
+        "operationId": "ping_api_modern_v1_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/models": {
+      "get": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "List Models",
+        "operationId": "list_models_api_modern_v1_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModernApiModel"
+                  },
+                  "type": "array",
+                  "title": "Response List Models Api Modern V1 Models Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/design-systems": {
+      "get": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "List Design Systems",
+        "operationId": "list_design_systems_api_modern_v1_design_systems_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModernApiDesignSystem"
+                  },
+                  "type": "array",
+                  "title": "Response List Design Systems Api Modern V1 Design Systems Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/presentations": {
+      "get": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "List Presentations",
+        "operationId": "list_presentations_api_modern_v1_presentations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModernApiPresentation"
+                  },
+                  "type": "array",
+                  "title": "Response List Presentations Api Modern V1 Presentations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Create Presentation",
+        "operationId": "create_presentation_api_modern_v1_presentations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModernApiCreatePresentationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiPresentation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/presentations/{presentation_id}": {
+      "get": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Get Presentation",
+        "operationId": "get_presentation_api_modern_v1_presentations__presentation_id__get",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiPresentation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Delete Presentation",
+        "operationId": "delete_presentation_api_modern_v1_presentations__presentation_id__delete",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/presentations/{presentation_id}/assets": {
+      "post": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Upload Assets",
+        "operationId": "upload_assets_api_modern_v1_presentations__presentation_id__assets_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_assets_api_modern_v1_presentations__presentation_id__assets_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModernApiAsset"
+                  },
+                  "title": "Response Upload Assets Api Modern V1 Presentations  Presentation Id  Assets Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/presentations/{presentation_id}/generate": {
+      "post": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Generate Presentation",
+        "operationId": "generate_presentation_api_modern_v1_presentations__presentation_id__generate_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModernApiGenerateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiOperation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/presentations/{presentation_id}/edits": {
+      "post": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Edit Presentation",
+        "operationId": "edit_presentation_api_modern_v1_presentations__presentation_id__edits_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModernApiEditInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiOperation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/presentations/{presentation_id}/exports": {
+      "post": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Export Presentation",
+        "operationId": "export_presentation_api_modern_v1_presentations__presentation_id__exports_post",
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModernApiExportInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiOperation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modern/v1/operations/{operation_id}": {
+      "get": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Get Operation",
+        "operationId": "get_operation_api_modern_v1_operations__operation_id__get",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiOperation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -662,7 +1144,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+            "description": "Current state: pending → in_progress → completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1010,7 +1492,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+            "description": "Current state: pending → in_progress → completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1153,7 +1635,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+            "description": "Current state: pending → in_progress → completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1427,7 +1909,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
+            "description": "Current state: pending → in_progress → completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1530,6 +2012,677 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "AgentPrimaryModel": {
+        "type": "string",
+        "enum": [
+          "openai/gpt-5.6-sol",
+          "openai/gpt-5.6-terra",
+          "anthropic/claude-opus-4.8",
+          "anthropic/claude-sonnet-5",
+          "anthropic/claude-sonnet-4-6",
+          "anthropic/claude-haiku-4-5",
+          "google/gemini-3.1-pro-preview",
+          "moonshotai/kimi-k2.6",
+          "z-ai/glm-5.2",
+          "anthropic/claude-opus-4.8-fast",
+          "anthropic/claude-fable-5"
+        ],
+        "title": "AgentPrimaryModel",
+        "description": "Selectable primary model for the modern deck and design system agents.\n\nValues are OpenRouter model IDs (see OpenRouterModels in ai_models/model_list.py)."
+      },
+      "ArtifactFormat": {
+        "type": "string",
+        "enum": [
+          "presentation",
+          "infographic",
+          "carousel",
+          "poster",
+          "social_post"
+        ],
+        "title": "ArtifactFormat"
+      },
+      "Body_upload_assets_api_modern_v1_presentations__presentation_id__assets_post": {
+        "properties": {
+          "files": {
+            "items": {
+              "type": "string",
+              "format": "binary"
+            },
+            "type": "array",
+            "title": "Files"
+          },
+          "metadata": {
+            "type": "string",
+            "title": "Metadata",
+            "default": "{}"
+          }
+        },
+        "type": "object",
+        "required": [
+          "files"
+        ],
+        "title": "Body_upload_assets_api_modern_v1_presentations__presentation_id__assets_post"
+      },
+      "ModernApiAsset": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "file_path": {
+            "type": "string",
+            "title": "File Path"
+          },
+          "role": {
+            "$ref": "#/components/schemas/ModernApiAssetRole"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ModernApiAssetScope"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "file_path",
+          "role",
+          "scope"
+        ],
+        "title": "ModernApiAsset"
+      },
+      "ModernApiAssetRole": {
+        "type": "string",
+        "enum": [
+          "brand_logo",
+          "reference_image",
+          "content_image",
+          "background"
+        ],
+        "title": "ModernApiAssetRole"
+      },
+      "ModernApiAssetScope": {
+        "type": "string",
+        "enum": [
+          "all_slides",
+          "generation"
+        ],
+        "title": "ModernApiAssetScope"
+      },
+      "ModernApiCanvasInput": {
+        "properties": {
+          "preset": {
+            "$ref": "#/components/schemas/ModernApiCanvasPreset",
+            "default": "16:9"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 2400.0,
+                "minimum": 100.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3240.0,
+                "minimum": 100.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ModernApiCanvasInput"
+      },
+      "ModernApiCanvasPreset": {
+        "type": "string",
+        "enum": [
+          "16:9",
+          "4:3",
+          "1:1",
+          "custom"
+        ],
+        "title": "ModernApiCanvasPreset"
+      },
+      "ModernApiCreatePresentationInput": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "default": "Untitled Presentation"
+          },
+          "artifact_format": {
+            "$ref": "#/components/schemas/ArtifactFormat",
+            "default": "presentation"
+          },
+          "canvas": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModernApiCanvasInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "design_system_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Design System Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ModernApiCreatePresentationInput"
+      },
+      "ModernApiDesignSystem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "target_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Format"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ModernApiDesignSystem"
+      },
+      "ModernApiEditInput": {
+        "properties": {
+          "instruction": {
+            "type": "string",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Instruction"
+          },
+          "slide_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Slide Ids"
+          },
+          "asset_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Asset Ids"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModernApiModelSelection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "base_commit_sha": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 7
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Commit Sha"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "instruction"
+        ],
+        "title": "ModernApiEditInput"
+      },
+      "ModernApiExportFormat": {
+        "type": "string",
+        "enum": [
+          "pdf",
+          "pptx",
+          "png"
+        ],
+        "title": "ModernApiExportFormat"
+      },
+      "ModernApiExportInput": {
+        "properties": {
+          "formats": {
+            "items": {
+              "$ref": "#/components/schemas/ModernApiExportFormat"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Formats"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "scale": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": 0.5,
+            "title": "Scale",
+            "default": 1.0
+          },
+          "disable_shadows": {
+            "type": "boolean",
+            "title": "Disable Shadows",
+            "default": false
+          },
+          "compress_pdf": {
+            "type": "boolean",
+            "title": "Compress Pdf",
+            "default": false
+          },
+          "base_commit_sha": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 7
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Commit Sha"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "formats"
+        ],
+        "title": "ModernApiExportInput"
+      },
+      "ModernApiGenerateInput": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 100000,
+            "minLength": 1,
+            "title": "Content"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "slide_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 50.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slide Count"
+          },
+          "asset_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Asset Ids"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModernApiModelSelection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "ModernApiGenerateInput"
+      },
+      "ModernApiModel": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/AgentPrimaryModel"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "internal_only": {
+            "type": "boolean",
+            "title": "Internal Only",
+            "default": false
+          },
+          "default": {
+            "type": "boolean",
+            "title": "Default",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "ModernApiModel"
+      },
+      "ModernApiModelSelection": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/AgentPrimaryModel"
+          },
+          "fallback_policy": {
+            "type": "string",
+            "const": "deny",
+            "title": "Fallback Policy",
+            "default": "deny"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "ModernApiModelSelection"
+      },
+      "ModernApiOperation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "operation_type": {
+            "type": "string",
+            "enum": [
+              "generate",
+              "edit",
+              "export"
+            ],
+            "title": "Operation Type"
+          },
+          "presentation_id": {
+            "type": "string",
+            "title": "Presentation Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ModernApiOperationStatus"
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Progress"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "operation_type",
+          "presentation_id",
+          "status"
+        ],
+        "title": "ModernApiOperation"
+      },
+      "ModernApiOperationStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "succeeded",
+          "failed"
+        ],
+        "title": "ModernApiOperationStatus"
+      },
+      "ModernApiPresentation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "artifact_format": {
+            "$ref": "#/components/schemas/ArtifactFormat"
+          },
+          "canvas_width": {
+            "type": "integer",
+            "title": "Canvas Width"
+          },
+          "canvas_height": {
+            "type": "integer",
+            "title": "Canvas Height"
+          },
+          "design_system_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Design System Id"
+          },
+          "repo_commit_sha": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repo Commit Sha"
+          },
+          "preview_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "artifact_format",
+          "canvas_width",
+          "canvas_height"
+        ],
+        "title": "ModernApiPresentation"
       }
     },
     "securitySchemes": {

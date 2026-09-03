@@ -1,0 +1,137 @@
+---
+title: "Modern Slides API"
+sidebarTitle: "Introduction"
+description: "Create deeply designed, editable presentations with Alai's most powerful AI workflow and any published design system."
+---
+
+Modern Slides are Alai's most capable presentation format. Instead of filling a fixed set of slide layouts, Alai's agent builds each deck as a flexible visual artifact. It can reason across the whole story, compose richer layouts, and revise the result through natural-language instructions.
+
+<CardGroup cols={2}>
+  <Card title="Our most powerful AI" icon="sparkles">
+    Use Alai's latest agentic presentation workflow, with explicit model choice when you need it.
+  </Card>
+  <Card title="Any design system" icon="palette">
+    Generate against any published design system available to your account—not only a predefined theme.
+  </Card>
+  <Card title="Precise, iterative control" icon="pen-to-square">
+    Target one slide or revise the whole deck, attach brand assets, and protect edits with commit-based concurrency.
+  </Card>
+  <Card title="Production-ready output" icon="file-export">
+    Export the generated artifact to PDF, editable PowerPoint, or PNG files.
+  </Card>
+</CardGroup>
+
+## Separate from Classic & Creative Slides
+
+The Modern Slides API is a separate contract under `/api/modern/v1`. It does not change the existing `/api/v1` Classic & Creative Slides endpoints, request shapes, or generation behavior. Both APIs use the same Bearer authentication so an existing Alai API key can authenticate either API.
+
+Choose Modern Slides when visual fidelity, design-system control, model choice, and natural-language iteration matter most. Continue using the Classic & Creative Slides API when you depend on its existing theme, variant, transcript, or per-slide workflows.
+
+## Base URL and authentication
+
+```text
+https://slides-api.getalai.com/api/modern/v1
+```
+
+Send your Alai API key as a Bearer token:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+Create API keys in Alai by opening your account menu, selecting **API**, and choosing **Add new API key**.
+
+<Warning>
+  Keep API keys on your server and never expose them in browser code, public repositories, or logs.
+</Warning>
+
+## End-to-end workflow
+
+<Steps>
+  <Step title="Discover your options">
+    Call `GET /models` and `GET /design-systems`. A presentation-format artifact requires a published design system.
+  </Step>
+  <Step title="Create the presentation">
+    Call `POST /presentations` with a title, canvas, and `design_system_id`. This creates the container immediately; it does not start AI generation.
+  </Step>
+  <Step title="Add brand or content assets">
+    Optionally upload logos, reference images, content images, or backgrounds with `POST /presentations/{id}/assets`.
+  </Step>
+  <Step title="Generate with your chosen model">
+    Call `POST /presentations/{id}/generate`. The response is an asynchronous operation; poll `GET /operations/{operation_id}` until it succeeds or fails.
+  </Step>
+  <Step title="Revise and export">
+    Submit natural-language edits, then request PDF, PPTX, or PNG exports. Edits and exports use the same operation polling flow.
+  </Step>
+</Steps>
+
+## Quick example
+
+```python
+import time
+import requests
+
+API_KEY = "your_api_key"
+BASE_URL = "https://slides-api.getalai.com/api/modern/v1"
+HEADERS = {"Authorization": f"Bearer {API_KEY}"}
+
+design_systems = requests.get(f"{BASE_URL}/design-systems", headers=HEADERS).json()
+
+presentation = requests.post(
+    f"{BASE_URL}/presentations",
+    headers=HEADERS,
+    json={
+        "title": "Quarterly business review",
+        "artifact_format": "presentation",
+        "canvas": {"preset": "16:9"},
+        "design_system_id": design_systems[0]["id"],
+    },
+).json()
+
+operation = requests.post(
+    f"{BASE_URL}/presentations/{presentation['id']}/generate",
+    headers=HEADERS,
+    json={
+        "content": "Q3 revenue grew 28%. Enterprise retention reached 96%.",
+        "instructions": "Create a concise executive QBR with a strong narrative.",
+        "slide_count": 6,
+        "model": {"id": "anthropic/claude-opus-4.8", "fallback_policy": "deny"},
+        "idempotency_key": "qbr-2026-q3",
+    },
+).json()
+
+while operation["status"] not in {"succeeded", "failed"}:
+    time.sleep(5)
+    operation = requests.get(
+        f"{BASE_URL}/operations/{operation['id']}", headers=HEADERS
+    ).json()
+
+if operation["status"] == "failed":
+    raise RuntimeError(operation["error"])
+
+print(operation["result"])
+```
+
+## Asynchronous operations
+
+Generate, edit, and export requests return `202 Accepted` with an operation whose status is `queued`, `running`, `succeeded`, or `failed`. Poll the operation endpoint every five seconds. The response includes structured progress while work is running, a `result` on success, or an `error` on failure.
+
+Use an `idempotency_key` for safely retrying mutating requests. Repeating the same request returns the original operation; reusing the key for different input returns `409 Conflict`. Idempotency protection is best-effort for exactly concurrent identical requests.
+
+For edit and export operations, `base_commit_sha` provides optimistic concurrency control. Pass the latest value from `GET /presentations/{id}` to prevent a stale client from modifying or exporting an unexpected revision.
+
+## Endpoint summary
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/ping` | Verify authentication and API version |
+| `GET` | `/models` | List models available to the caller and identify the default |
+| `GET` | `/design-systems` | List published design systems available to the caller |
+| `GET` / `POST` | `/presentations` | List presentations or create an empty one |
+| `GET` / `DELETE` | `/presentations/{id}` | Read or delete an owned presentation |
+| `POST` | `/presentations/{id}/assets` | Upload semantically labeled images |
+| `POST` | `/presentations/{id}/generate` | Generate the initial artifact |
+| `POST` | `/presentations/{id}/edits` | Revise slides with natural language |
+| `POST` | `/presentations/{id}/exports` | Export PDF, PPTX, and/or PNG |
+| `GET` | `/operations/{id}` | Read asynchronous progress and results |
+

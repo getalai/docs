@@ -1,0 +1,23 @@
+---
+title: "Edit Presentation"
+openapi: "POST /api/modern/v1/presentations/{presentation_id}/edits"
+---
+
+Revise a generated Modern artifact with natural-language instructions. Omit `slide_ids` for a deck-wide edit or include up to 50 slide IDs to scope the change. Uploaded assets can be introduced or reused through `asset_ids`.
+
+Pass the latest `repo_commit_sha` as `base_commit_sha` to ensure the edit applies to the revision you read. If the deck has changed, the operation fails instead of overwriting newer work.
+
+```json
+{
+  "instruction": "Make the opening more energetic and retain the station logo.",
+  "slide_ids": ["slide-1"],
+  "asset_ids": ["LOGO_ASSET_ID"],
+  "model": {
+    "id": "anthropic/claude-opus-4.8",
+    "fallback_policy": "deny"
+  },
+  "base_commit_sha": "CURRENT_COMMIT_SHA",
+  "idempotency_key": "futuri-edit-123"
+}
+```
+

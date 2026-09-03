@@ -1,0 +1,22 @@
+---
+title: "List Models"
+openapi: "GET /api/modern/v1/models"
+---
+
+List the AI models available to the authenticated user. The response mirrors the model choices available to that user in Alai and marks the default model with `default: true`.
+
+Pass a returned `id` in the `model` object of a generate or edit request. If `model` is omitted, Alai uses the current default. Version 1 supports `fallback_policy: "deny"`: Alai fails the operation instead of silently switching away from your selected model.
+
+```json
+{
+  "model": {
+    "id": "anthropic/claude-opus-4.8",
+    "fallback_policy": "deny"
+  }
+}
+```
+
+<Note>
+  Model availability can differ by account and may change over time. Discover models at runtime instead of hard-coding the full model list.
+</Note>
+
