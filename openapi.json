@@ -2069,7 +2069,7 @@
           "anthropic/claude-haiku-4-5",
           "google/gemini-3.1-pro-preview",
           "moonshotai/kimi-k2.6",
-          "z-ai/glm-5.2",
+          "z-ai/glm-5.3-flash",
           "anthropic/claude-opus-4.8-fast",
           "anthropic/claude-fable-5"
         ],
