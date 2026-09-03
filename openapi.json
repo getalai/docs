@@ -267,7 +267,7 @@
           "External API"
         ],
         "summary": "Add a slide to an existing presentation",
-        "description": "Add a new slide to an existing presentation. This is an async operation—poll the returned `generation_id` for completion.\n\nThe slide content will be transformed into a professionally designed slide with AI-generated layout and optional images.",
+        "description": "Add a new slide to an existing presentation. This is an async operation\u2014poll the returned `generation_id` for completion.\n\nThe slide content will be transformed into a professionally designed slide with AI-generated layout and optional images.",
         "operationId": "create_slide_api_v1_presentations__presentation_id__slides_post",
         "parameters": [
           {
@@ -994,6 +994,48 @@
           }
         }
       }
+    },
+    "/api/modern/v1/operations/{operation_id}/cancel": {
+      "post": {
+        "tags": [
+          "Modern Slides API"
+        ],
+        "summary": "Cancel Operation",
+        "operationId": "cancel_operation_api_modern_v1_operations__operation_id__cancel_post",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModernApiOperation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1173,7 +1215,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending → in_progress → completed/failed"
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1538,7 +1580,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending → in_progress → completed/failed"
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1693,7 +1735,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending → in_progress → completed/failed"
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
             "anyOf": [
@@ -1886,7 +1928,7 @@
           },
           "status": {
             "$ref": "#/components/schemas/ApiGenerationStatus",
-            "description": "Current state: pending → in_progress → completed/failed"
+            "description": "Current state: pending \u2192 in_progress \u2192 completed/failed"
           },
           "error": {
             "anyOf": [
@@ -2561,13 +2603,12 @@
           "error": {
             "anyOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/ModernApiOperationError"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Error"
+            ]
           },
           "created_at": {
             "anyOf": [
@@ -2618,7 +2659,8 @@
           "queued",
           "running",
           "succeeded",
-          "failed"
+          "failed",
+          "cancelled"
         ],
         "title": "ModernApiOperationStatus"
       },
@@ -2686,6 +2728,34 @@
           "canvas_height"
         ],
         "title": "ModernApiPresentation"
+      },
+      "ModernApiOperationError": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ModernApiOperationErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ModernApiOperationError"
+      },
+      "ModernApiOperationErrorCode": {
+        "type": "string",
+        "enum": [
+          "insufficient_credits",
+          "cancelled",
+          "invalid_request",
+          "timeout",
+          "internal_error"
+        ],
+        "title": "ModernApiOperationErrorCode"
       }
     },
     "securitySchemes": {

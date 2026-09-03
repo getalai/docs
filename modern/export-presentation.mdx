@@ -5,6 +5,10 @@ openapi: "POST /api/modern/v1/presentations/{presentation_id}/exports"
 
 Export the current Modern artifact to one or more formats: `pdf`, `pptx`, and `png`. The request returns an asynchronous operation. When it succeeds, `result.formats` contains signed download URLs valid for 24 hours. A multi-page PNG export may be returned as a ZIP archive.
 
+<Note>
+  The request field is the plural `formats` and its value must be a JSON array, even when requesting one format—for example, `"formats": ["pdf"]`.
+</Note>
+
 ```json
 {
   "formats": ["pdf", "pptx", "png"],

@@ -1,0 +1,23 @@
+---
+title: "Cancel Operation"
+openapi: "POST /api/modern/v1/operations/{operation_id}/cancel"
+---
+
+Cancel an owned Modern Slides operation while it is `queued` or `running`. The response is the terminal operation with `status: "cancelled"` and a structured cancellation error.
+
+```json
+{
+  "id": "OPERATION_ID",
+  "operation_type": "generate",
+  "presentation_id": "PRESENTATION_ID",
+  "status": "cancelled",
+  "progress": null,
+  "result": null,
+  "error": {
+    "code": "cancelled",
+    "message": "Operation cancelled by user"
+  }
+}
+```
+
+Calling this endpoint again after cancellation returns the same cancelled operation. If the operation has already succeeded or failed, the API returns `409 Conflict`.

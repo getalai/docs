@@ -3,7 +3,7 @@ title: "Get Operation"
 openapi: "GET /api/modern/v1/operations/{operation_id}"
 ---
 
-Read the status, progress, result, and error for a generate, edit, or export operation. Poll approximately every five seconds until `status` is `succeeded` or `failed`.
+Read the status, progress, result, and error for a generate, edit, or export operation. Poll approximately every five seconds until `status` is `succeeded`, `failed`, or `cancelled`.
 
 ```json
 {
@@ -33,3 +33,18 @@ Read the status, progress, result, and error for a generate, edit, or export ope
 | `running` | Actively generating, editing, or exporting |
 | `succeeded` | Complete; read the operation's `result` |
 | `failed` | Complete with an error; inspect `error` |
+| `cancelled` | Cancelled by the caller; no result will be published |
+
+Failures use a stable structured error:
+
+```json
+{
+  "status": "failed",
+  "error": {
+    "code": "insufficient_credits",
+    "message": "Insufficient credits"
+  }
+}
+```
+
+Error codes are `insufficient_credits`, `cancelled`, `invalid_request`, `timeout`, and `internal_error`.

@@ -68,7 +68,8 @@
               "modern/generate-presentation",
               "modern/edit-presentation",
               "modern/export-presentation",
-              "modern/get-operation"
+              "modern/get-operation",
+              "modern/cancel-operation"
             ]
           }
         ]
