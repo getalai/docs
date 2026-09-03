@@ -2068,6 +2068,7 @@
           "anthropic/claude-sonnet-4-6",
           "anthropic/claude-haiku-4-5",
           "google/gemini-3.1-pro-preview",
+          "google/gemini-3.8-flash",
           "moonshotai/kimi-k2.6",
           "z-ai/glm-5.3-flash",
           "anthropic/claude-opus-4.8-fast",
