@@ -15,12 +15,14 @@
         "pages": [
           "api/introduction",
           "api/mcp",
+          "api/a2a",
           "api/examples",
           {
             "group": "Presentations",
             "pages": [
               "api/get-presentations",
               "api/get-themes",
+              "api/get-vibes",
               "api/generations",
               "api/generation-status",
               "api/export-presentation",

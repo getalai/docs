@@ -90,6 +90,38 @@
         }
       }
     },
+    "/api/v1/vibes": {
+      "get": {
+        "tags": [
+          "External API"
+        ],
+        "summary": "List available vibes",
+        "description": "Returns vibe IDs and names for all system vibes and custom user vibes accessible to the authenticated user. Pass the `id` as `presentation_options.vibe_id` on a generation request.",
+        "operationId": "get_vibes_api_v1_vibes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetVibesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/upload-images": {
       "post": {
         "tags": [
@@ -1056,6 +1088,11 @@
             "title": "Additional Instructions",
             "description": "Guidance for the AI on this specific slide's style or content focus."
           },
+          "slide_type": {
+            "$ref": "#/components/schemas/SlideType",
+            "description": "Slide style: 'classic' for structured editable text-led slides, or 'creative' for image-led slides generated with Nano Banana Pro.",
+            "default": "classic"
+          },
           "slide_order": {
             "anyOf": [
               {
@@ -1075,14 +1112,6 @@
             "title": "Total Variants Per Slide",
             "description": "Number of distinct options to generate for each slide",
             "default": 1
-          },
-          "num_image_variants": {
-            "type": "integer",
-            "maximum": 2.0,
-            "minimum": 0.0,
-            "title": "Num Image Variants",
-            "description": "Number of image slide variants generated using Nano Banana Pro. Increases cost.",
-            "default": 0
           }
         },
         "type": "object",
@@ -1366,6 +1395,23 @@
         ],
         "title": "GetPresentationsResponse"
       },
+      "GetVibesResponse": {
+        "properties": {
+          "vibes": {
+            "items": {
+              "$ref": "#/components/schemas/VibeSummary"
+            },
+            "type": "array",
+            "title": "Vibes",
+            "description": "Vibes available to the authenticated user"
+          }
+        },
+        "type": "object",
+        "required": [
+          "vibes"
+        ],
+        "title": "GetVibesResponse"
+      },
       "GetThemesResponse": {
         "properties": {
           "themes": {
@@ -1602,6 +1648,18 @@
             "title": "Total Variants Per Slide",
             "description": "Number of distinct options to generate for each slide",
             "default": 1
+          },
+          "vibe_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vibe Id",
+            "description": "Vibe ID controlling the visual aesthetic of creative variants. Use GET /vibes to list available IDs. Requires image_options.num_image_variants >= 1 when set. If omitted, standard theme styling is used."
           }
         },
         "type": "object",
@@ -1718,6 +1776,14 @@
         ],
         "title": "SlideCreationStatus"
       },
+      "SlideType": {
+        "type": "string",
+        "enum": [
+          "classic",
+          "creative"
+        ],
+        "title": "SlideType"
+      },
       "SlideRange": {
         "type": "string",
         "enum": [
@@ -1775,27 +1841,6 @@
         ],
         "title": "SlideTranscript"
       },
-      "TextAmountMode": {
-        "type": "string",
-        "enum": [
-          "minimal",
-          "essential",
-          "balanced",
-          "detailed",
-          "custom"
-        ],
-        "title": "TextAmountMode"
-      },
-      "TextContentMode": {
-        "type": "string",
-        "enum": [
-          "enhance",
-          "condense",
-          "preserve",
-          "custom"
-        ],
-        "title": "TextContentMode"
-      },
       "TextOptions": {
         "properties": {
           "language": {
@@ -1808,57 +1853,6 @@
               }
             ],
             "description": "Output language. If not set, matches the input language."
-          },
-          "tone": {
-            "$ref": "#/components/schemas/ToneType",
-            "description": "Writing style: professional, casual, technical, educational, etc. Use 'custom' with tone_instructions for specific guidance.",
-            "default": "DEFAULT"
-          },
-          "tone_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tone Instructions",
-            "description": "Required when tone='custom'. Describe the desired voice and style."
-          },
-          "content_mode": {
-            "$ref": "#/components/schemas/TextContentMode",
-            "description": "How to handle input content. 'preserve': use as-is. 'condense': shorten. 'enhance': expand with context. 'custom': follow content_instructions.",
-            "default": "preserve"
-          },
-          "content_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Content Instructions",
-            "description": "Required when content_mode='custom'. Describe how to transform the content."
-          },
-          "amount_mode": {
-            "$ref": "#/components/schemas/TextAmountMode",
-            "description": "Text density per slide. 'minimal': keywords only. 'essential': key points. 'balanced': with context. 'detailed': comprehensive.",
-            "default": "essential"
-          },
-          "amount_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Amount Instructions",
-            "description": "Required when amount_mode='custom'. Describe the desired text density."
           }
         },
         "type": "object",
@@ -1883,23 +1877,6 @@
           "name"
         ],
         "title": "ThemeSummary"
-      },
-      "ToneType": {
-        "type": "string",
-        "enum": [
-          "DEFAULT",
-          "PROFESSIONAL",
-          "CASUAL",
-          "TECHNICAL",
-          "EDUCATIONAL",
-          "INSPIRATIONAL",
-          "NARRATIVE",
-          "PERSUASIVE",
-          "AUTHORITATIVE",
-          "EMPATHETIC",
-          "CUSTOM"
-        ],
-        "title": "ToneType"
       },
       "TranscriptStatus": {
         "properties": {
@@ -1979,6 +1956,32 @@
           "created_at"
         ],
         "title": "TranscriptStatus"
+      },
+      "VibeSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique vibe identifier"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Vibe display name"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "'system' or 'custom'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "source"
+        ],
+        "title": "VibeSummary"
       },
       "ValidationError": {
         "properties": {
